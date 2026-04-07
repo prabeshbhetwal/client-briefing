@@ -1,0 +1,2827 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Website Brief</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ================================================
+       RESET & CUSTOM PROPERTIES
+    ================================================ */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --navy: #1b2b4b;
+        --navy-mid: #243555;
+        --navy-light: #2e4070;
+        --gold: #b8962b;
+        --gold-light: #d0aa3a;
+        --gold-pale: #f5eed4;
+        --bg: #f6f4ef;
+        --white: #ffffff;
+        --text: #1a1a1a;
+        --text-mid: #464646;
+        --text-soft: #767676;
+        --border: #dedad2;
+        --border-dark: #c8c3b8;
+        --success: #2d7a4a;
+        --radius: 9px;
+        --shadow-sm: 0 1px 4px rgba(27, 43, 75, 0.07);
+        --shadow-md: 0 3px 14px rgba(27, 43, 75, 0.1);
+      }
+
+      /* ================================================
+       BASE
+    ================================================ */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.65;
+        font-size: 15px;
+      }
+
+      /* ================================================
+       HEADER
+    ================================================ */
+      .site-header {
+        background: var(--navy);
+        padding: 44px 24px 40px;
+        text-align: center;
+      }
+      .site-header .brand {
+        font-family: "Lora", Georgia, serif;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: var(--gold-light);
+        margin-bottom: 10px;
+        text-transform: uppercase;
+      }
+      .site-header .doc-title {
+        font-size: 19px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 6px;
+      }
+      .site-header .doc-meta {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.5);
+      }
+
+      /* ================================================
+       LAYOUT
+    ================================================ */
+      .container {
+        max-width: 830px;
+        margin: 0 auto;
+        padding: 32px 22px 100px;
+      }
+
+      /* ================================================
+       INTRO CARD
+    ================================================ */
+      .intro-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--gold);
+        border-radius: var(--radius);
+        padding: 24px 28px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-sm);
+      }
+      .intro-card h2 {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--navy);
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .intro-card p {
+        font-size: 14px;
+        color: var(--text-mid);
+        margin-bottom: 8px;
+      }
+      .intro-card p:last-child {
+        margin-bottom: 0;
+      }
+
+      /* ================================================
+       SAVE STATUS BAR
+    ================================================ */
+      .status-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 10px 16px;
+        margin-bottom: 28px;
+        font-size: 12.5px;
+        color: var(--text-soft);
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+        flex-shrink: 0;
+        transition: background 0.3s;
+      }
+      .status-dot.unsaved {
+        background: #d4900a;
+      }
+
+      /* ================================================
+       SECTION CARDS
+    ================================================ */
+      .section-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 22px;
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+      }
+      .section-header {
+        background: var(--navy);
+        padding: 18px 26px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .section-badge {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: var(--gold);
+        color: white;
+        font-family: "Lora", Georgia, serif;
+        font-weight: 700;
+        font-size: 17px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .section-heading h2 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 2px;
+      }
+      .section-heading p {
+        font-size: 12.5px;
+        color: rgba(255, 255, 255, 0.55);
+      }
+      .section-body {
+        padding: 26px 28px;
+      }
+
+      /* ================================================
+       QUESTION GROUPS
+    ================================================ */
+      .q-group {
+        margin-bottom: 26px;
+      }
+      .q-group:last-child {
+        margin-bottom: 0;
+      }
+
+      .q-label {
+        display: block;
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--navy);
+        margin-bottom: 5px;
+      }
+      .q-label .optional {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--text-soft);
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        padding: 1px 7px;
+        margin-left: 7px;
+        vertical-align: middle;
+      }
+      .q-hint {
+        display: block;
+        font-size: 13px;
+        color: var(--text-soft);
+        margin-bottom: 8px;
+        font-style: italic;
+      }
+      .q-example {
+        font-size: 12.5px;
+        color: var(--text-soft);
+        background: var(--bg);
+        border-left: 3px solid var(--border-dark);
+        padding: 7px 11px;
+        border-radius: 0 5px 5px 0;
+        margin-bottom: 10px;
+        line-height: 1.55;
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--border);
+        margin: 22px 0;
+      }
+
+      /* ================================================
+       INPUTS
+    ================================================ */
+      input[type="text"],
+      input[type="email"],
+      input[type="number"],
+      textarea,
+      select {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--text);
+        background: white;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+        outline: none;
+        resize: vertical;
+      }
+      input[type="text"]:focus,
+      input[type="email"]:focus,
+      input[type="number"]:focus,
+      textarea:focus {
+        border-color: var(--gold);
+        box-shadow: 0 0 0 3px rgba(184, 150, 43, 0.13);
+      }
+      textarea {
+        min-height: 88px;
+      }
+      textarea.ta-tall {
+        min-height: 120px;
+      }
+      input[type="number"] {
+        width: 70px;
+        text-align: center;
+      }
+
+      /* ================================================
+       CHECK + RADIO ITEMS
+    ================================================ */
+      .check-list,
+      .radio-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .check-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .c-item,
+      .r-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.12s;
+      }
+      .c-item:hover,
+      .r-item:hover {
+        background: var(--bg);
+      }
+
+      .c-item input[type="checkbox"],
+      .r-item input[type="radio"] {
+        width: 16px;
+        height: 16px;
+        margin-top: 2px;
+        flex-shrink: 0;
+        accent-color: var(--gold);
+        cursor: pointer;
+      }
+      .c-item label,
+      .r-item label {
+        font-size: 14px;
+        color: var(--text-mid);
+        cursor: pointer;
+        line-height: 1.5;
+      }
+      .c-item label .sub,
+      .r-item label .sub {
+        display: block;
+        font-size: 12px;
+        color: var(--text-soft);
+        margin-top: 2px;
+      }
+
+      /* ================================================
+       PAGE OPTIONS (Section D)
+    ================================================ */
+      .page-block {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+      .page-block:last-child {
+        margin-bottom: 0;
+      }
+
+      .page-block-header {
+        background: var(--bg);
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .page-block-header strong {
+        font-size: 14.5px;
+        color: var(--navy);
+        flex: 1;
+      }
+      .page-block-header span {
+        font-size: 12px;
+        color: var(--text-soft);
+      }
+      .page-block-body {
+        padding: 14px 16px;
+      }
+
+      .when-radio {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+      .when-radio label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: 20px;
+        font-size: 13px;
+        color: var(--text-mid);
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .when-radio input[type="radio"] {
+        accent-color: var(--gold);
+        width: 14px;
+        height: 14px;
+      }
+      .when-radio label:has(input:checked) {
+        border-color: var(--gold);
+        background: var(--gold-pale);
+        color: var(--navy);
+        font-weight: 600;
+      }
+
+      .twin-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      @media (max-width: 580px) {
+        .twin-col {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .sub-label {
+        display: block;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-mid);
+        margin-bottom: 5px;
+      }
+
+      /* ================================================
+       GOALS TABLE (Section C)
+    ================================================ */
+      .goals-list {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-top: 10px;
+      }
+
+      .goal-row {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        border: 1px solid var(--border);
+        border-radius: 7px;
+        transition: background 0.12s;
+      }
+      .goal-row:hover {
+        background: var(--bg);
+      }
+
+      .goal-row .goal-name {
+        font-size: 13.5px;
+      }
+      .goal-row .goal-name small {
+        display: block;
+        font-size: 12px;
+        color: var(--text-soft);
+        margin-top: 2px;
+      }
+      .goal-row .goal-tick input {
+        width: 17px;
+        height: 17px;
+        accent-color: var(--gold);
+      }
+      .goal-row .goal-priority {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--text-soft);
+      }
+      .goal-row .goal-priority input[type="number"] {
+        width: 52px;
+        font-size: 13px;
+        padding: 5px 8px;
+      }
+
+      /* ================================================
+       STYLE PREFERENCE BLOCK (Section F)
+    ================================================ */
+      .pref-block {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+      }
+      .pref-block p {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--navy);
+        margin-bottom: 10px;
+      }
+
+      /* ================================================
+       STICKY ACTION BAR
+    ================================================ */
+      .action-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid var(--border);
+        padding: 13px 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 100;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.07);
+      }
+      .action-bar .ab-status {
+        flex: 1;
+        font-size: 12.5px;
+        color: var(--text-soft);
+      }
+
+      /* ================================================
+       BUTTONS
+    ================================================ */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 9px 18px;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 13.5px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+        border: none;
+        white-space: nowrap;
+      }
+      .btn-ghost {
+        background: transparent;
+        border: 1.5px solid var(--border-dark);
+        color: var(--text-mid);
+      }
+      .btn-ghost:hover {
+        border-color: var(--navy);
+        color: var(--navy);
+      }
+
+      .btn-navy {
+        background: var(--navy);
+        color: white;
+      }
+      .btn-navy:hover {
+        background: var(--navy-light);
+      }
+
+      .btn-gold {
+        background: var(--gold);
+        color: white;
+      }
+      .btn-gold:hover {
+        background: var(--gold-light);
+      }
+
+      /* ================================================
+       MODAL
+    ================================================ */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.48);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+
+      .modal {
+        background: white;
+        border-radius: 12px;
+        max-width: 520px;
+        width: 100%;
+        padding: 32px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+        position: relative;
+      }
+      .modal h2 {
+        font-family: "Lora", Georgia, serif;
+        font-size: 21px;
+        color: var(--navy);
+        margin-bottom: 12px;
+      }
+      .modal p {
+        font-size: 13.5px;
+        color: var(--text-mid);
+        margin-bottom: 14px;
+        line-height: 1.6;
+      }
+      .modal .email-field {
+        margin-bottom: 20px;
+      }
+      .modal .email-field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--navy);
+        margin-bottom: 6px;
+      }
+      .modal .btn-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .modal .privacy-note {
+        font-size: 11.5px;
+        color: var(--text-soft);
+        margin-top: 16px;
+        margin-bottom: 0;
+      }
+
+      /* ================================================
+       SUCCESS BANNER
+    ================================================ */
+      .success-banner {
+        display: none;
+        background: #eaf7ef;
+        border: 2px solid var(--success);
+        border-radius: var(--radius);
+        padding: 26px 28px;
+        text-align: center;
+        margin-top: 24px;
+      }
+      .success-banner h3 {
+        font-size: 17px;
+        color: var(--success);
+        margin-bottom: 6px;
+      }
+      .success-banner p {
+        font-size: 14px;
+        color: var(--text-mid);
+      }
+
+      /* ================================================
+       TOAST
+    ================================================ */
+      .toast {
+        position: fixed;
+        bottom: 76px;
+        right: 22px;
+        background: var(--navy);
+        color: white;
+        padding: 11px 18px;
+        border-radius: 8px;
+        font-size: 13.5px;
+        opacity: 0;
+        transform: translateY(6px);
+        transition: all 0.22s ease;
+        z-index: 300;
+        pointer-events: none;
+        max-width: 300px;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ================================================
+       FOOTER
+    ================================================ */
+      .site-footer {
+        background: var(--navy);
+        color: rgba(255, 255, 255, 0.4);
+        text-align: center;
+        padding: 18px 24px;
+        font-size: 12px;
+      }
+
+      /* ================================================
+       PRINT STYLES
+    ================================================ */
+      @media print {
+        @page {
+          margin: 18mm 15mm;
+        }
+
+        body {
+          font-size: 11pt;
+          background: white;
+          color: black;
+        }
+
+        .action-bar,
+        .status-bar,
+        .toast,
+        .site-footer {
+          display: none !important;
+        }
+
+        .container {
+          max-width: 100%;
+          padding: 0;
+        }
+
+        .site-header {
+          background: none !important;
+          border-bottom: 1.5pt solid #333;
+          padding: 0 0 12pt 0;
+          margin-bottom: 14pt;
+        }
+        .site-header .brand {
+          color: #1b2b4b !important;
+        }
+        .site-header .doc-title {
+          color: black !important;
+        }
+        .site-header .doc-meta {
+          color: #666 !important;
+        }
+
+        .intro-card {
+          border: 0.8pt solid #bbb;
+          border-left: 3pt solid #b8962b;
+          box-shadow: none;
+          break-inside: avoid;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        .section-card {
+          border: 0.8pt solid #bbb;
+          box-shadow: none;
+          break-inside: avoid;
+          page-break-inside: avoid;
+          margin-bottom: 14pt;
+        }
+
+        .section-header {
+          background: #f0f0f0 !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        .section-heading h2 {
+          color: #1b2b4b !important;
+        }
+        .section-heading p {
+          color: #666 !important;
+        }
+        .section-badge {
+          background: #1b2b4b !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        .page-block-header {
+          background: #f5f5f5 !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        .pref-block {
+          background: #f5f5f5 !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        textarea {
+          border: 0.8pt solid #aaa !important;
+          box-shadow: none !important;
+          min-height: 42pt;
+        }
+        textarea.ta-tall {
+          min-height: 70pt;
+        }
+      }
+
+      /* ================================================
+       RESPONSIVE
+    ================================================ */
+      @media (max-width: 620px) {
+        .section-body {
+          padding: 20px 16px;
+        }
+        .section-header {
+          padding: 14px 18px;
+        }
+        .check-grid {
+          grid-template-columns: 1fr;
+        }
+        .action-bar {
+          flex-wrap: wrap;
+        }
+        .action-bar .ab-status {
+          width: 100%;
+          order: -1;
+        }
+        .goal-row {
+          grid-template-columns: 1fr auto;
+        }
+        .goal-row .goal-priority {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ================================================
+     HEADER
+================================================ -->
+    <header class="site-header">
+      <div class="brand" id="headerBrand">Your Web Developer</div>
+      <div class="doc-title">
+        Website Brief — What Do You Want From Your Website?
+      </div>
+      <div class="doc-meta" id="headerDate">
+        Complete this form and submit it, or print it to discuss in person.
+      </div>
+    </header>
+
+    <!-- ================================================
+     MAIN
+================================================ -->
+    <main class="container">
+      <!-- INTRO -->
+      <div class="intro-card">
+        <h2>Before you begin</h2>
+        <p>
+          This checklist will help turn your ideas for your new website into a
+          clear, practical plan. There are no wrong answers — the goal is simply
+          to understand what you want, who it is for, and what it should achieve
+          for your business.
+        </p>
+        <p>
+          Take your time. Your answers are
+          <strong>automatically saved</strong> as you type, so you can close the
+          page and come back to it. When you are finished, use the buttons at
+          the bottom to either <strong>print a copy</strong> or
+          <strong>submit your answers directly</strong>.
+        </p>
+        <p>
+          If any question is unclear, skip it and write your question in
+          <strong>Section H</strong> at the end.
+        </p>
+      </div>
+
+      <!-- STATUS BAR -->
+      <div class="status-bar">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText"
+          >Your answers will be saved automatically as you type.</span
+        >
+      </div>
+
+      <!-- ================================================
+       FORM
+  ================================================ -->
+      <!--
+    DEVELOPER NOTE:
+    To enable email submission, sign up free at https://formspree.io
+    Create a new form and replace YOUR_FORM_ID below with your actual form ID.
+    Submissions will be emailed to the address you registered with.
+    If YOUR_FORM_ID is not replaced, the fallback summary/email method will be used.
+  -->
+      <form
+        id="briefForm"
+        action="https://formspree.io/f/mykbowbn"
+        method="POST"
+        novalidate
+      >
+        <!-- ============================================
+         A — QUICK OVERVIEW
+    ============================================ -->
+        <div class="section-card" id="secA">
+          <div class="section-header">
+            <div class="section-badge">A</div>
+            <div class="section-heading">
+              <h2>Quick Overview</h2>
+              <p>A few warm-up questions to get things started</p>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="q-group">
+              <label class="q-label" for="a1"
+                >What is the name of your business or project?</label
+              >
+              <input
+                type="text"
+                id="a1"
+                name="A1_Business_Name"
+                placeholder="e.g. Acme Trading Co."
+              />
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="a2"
+                >In one or two sentences, how would you describe what your
+                business does to a friend?</label
+              >
+              <span class="q-hint"
+                >Imagine you are at dinner and someone asks, "So what does your
+                company actually do?" — write your answer here.</span
+              >
+              <textarea
+                id="a2"
+                name="A2_Business_Description"
+                placeholder="Your answer here…"
+              ></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="a3"
+                >In one or two sentences, what do you want this website to help
+                you with right now?</label
+              >
+              <span class="q-hint"
+                >Think about the one most important problem the website should
+                solve for you at this stage.</span
+              >
+              <div class="q-example">
+                Example: "I want people to find us online and see that we are a
+                credible, professional developer." <br />Or: "I want investors
+                and buyers to see our current projects and contact us easily."
+              </div>
+              <textarea
+                id="a3"
+                name="A3_Primary_Goal"
+                placeholder="Your answer here…"
+              ></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="a4"
+                >Is there a website you can point us to as a reference or
+                starting point? <span class="optional">Optional</span></label
+              >
+              <span class="q-hint"
+                >Not a commitment — just a visual reference so we understand
+                your style from the start.</span
+              >
+              <div class="q-example">
+                Example: <em>www.squarespace.com/templates</em>, or any business
+                in your industry whose website you admire.
+              </div>
+              <input
+                type="text"
+                id="a4"
+                name="A4_Reference_Website"
+                placeholder="e.g. www.example.com.au"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================
+         B — TARGET AUDIENCE
+    ============================================ -->
+        <div class="section-card" id="secB">
+          <div class="section-header">
+            <div class="section-badge">B</div>
+            <div class="section-heading">
+              <h2>Who This Website Is For</h2>
+              <p>
+                Understanding your visitors helps us show them the right things
+              </p>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="q-group">
+              <span class="q-label"
+                >Which types of people are most likely to visit your
+                website?</span
+              >
+              <span class="q-hint"
+                >Tick all that apply — these are the people you most want to
+                reach.</span
+              >
+              <div class="check-grid">
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="aud_customers"
+                    name="B1_Audience[]"
+                    value="Potential customers or clients"
+                  />
+                  <label for="aud_customers"
+                    >Potential customers or clients<span class="sub"
+                      >People who might buy your product or service</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="aud_existing"
+                    name="B1_Audience[]"
+                    value="Existing customers"
+                  />
+                  <label for="aud_existing"
+                    >Existing customers<span class="sub"
+                      >People who already work with you</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="aud_partners"
+                    name="B1_Audience[]"
+                    value="Business partners or suppliers"
+                  />
+                  <label for="aud_partners"
+                    >Business partners or suppliers<span class="sub"
+                      >Companies or individuals you work alongside</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="aud_investors"
+                    name="B1_Audience[]"
+                    value="Investors or funders"
+                  />
+                  <label for="aud_investors"
+                    >Investors or funders<span class="sub"
+                      >People providing financial backing or support</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="aud_industry"
+                    name="B1_Audience[]"
+                    value="Industry peers or referrers"
+                  />
+                  <label for="aud_industry"
+                    >Industry peers or referrers<span class="sub"
+                      >Other professionals who might recommend you</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="aud_media"
+                    name="B1_Audience[]"
+                    value="Media or press"
+                  />
+                  <label for="aud_media"
+                    >Media or press<span class="sub"
+                      >Journalists, bloggers, or publications</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="aud_public"
+                    name="B1_Audience[]"
+                    value="General public"
+                  />
+                  <label for="aud_public"
+                    >General public<span class="sub"
+                      >People who find you via search or word of mouth</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="aud_other"
+                    name="B1_Audience[]"
+                    value="Other (see below)"
+                  />
+                  <label for="aud_other"
+                    >Other<span class="sub">Describe below</span></label
+                  >
+                </div>
+              </div>
+              <textarea
+                name="B1_Audience_Other"
+                placeholder="Any others not listed above? Describe them here…"
+                style="margin-top: 10px"
+              ></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="b2"
+                >Of those visitors, who is the single most important group you
+                want to reach right now?</label
+              >
+              <span class="q-hint"
+                >If the website could only speak to one group perfectly, who
+                would that be?</span
+              >
+              <input
+                type="text"
+                id="b2"
+                name="B2_Primary_Audience"
+                placeholder="e.g. Potential customers, or existing clients, or business partners…"
+              />
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="b3"
+                >When that type of person visits your website, what are they
+                most likely looking for?</label
+              >
+              <span class="q-hint"
+                >Think about what questions they would arrive with, or what
+                information would make them stop and read.</span
+              >
+              <div class="q-example">
+                Example: "A potential client would want to see our past work,
+                understand what we offer, and know how to get in touch."
+                <br />Or: "A business partner would want to understand our
+                values, our track record, and how to start a conversation."
+              </div>
+              <textarea
+                id="b3"
+                name="B3_Visitor_Intent"
+                placeholder="Your answer here…"
+              ></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="b4"
+                >What would be a "good outcome" for them after visiting your
+                website?</label
+              >
+              <span class="q-hint"
+                >A good outcome means they leave the site feeling or doing
+                something positive for your business.</span
+              >
+              <div class="q-example">
+                Example: "They feel confident we are a serious, credible
+                business." <br />Or: "They call us." &nbsp;Or: "They save our
+                site to come back when they are ready to proceed."
+              </div>
+              <textarea
+                id="b4"
+                name="B4_Visitor_Outcome"
+                placeholder="Your answer here…"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================
+         C — BUSINESS GOALS
+    ============================================ -->
+        <div class="section-card" id="secC">
+          <div class="section-header">
+            <div class="section-badge">C</div>
+            <div class="section-heading">
+              <h2>What the Website Should Achieve</h2>
+              <p>
+                Your goals for this website over the next six to twelve months
+              </p>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="q-group">
+              <label class="q-label" for="c1"
+                >In your own words, what would make this website a success for
+                you in the next six to twelve months?</label
+              >
+              <span class="q-hint"
+                >Think about what would make you look back and say, "Yes — that
+                was worth building."</span
+              >
+              <textarea
+                id="c1"
+                name="C1_Success_Definition"
+                class="ta-tall"
+                placeholder="Your answer here…"
+              ></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <span class="q-label"
+                >Which of these goals are important to you?</span
+              >
+              <span class="q-hint"
+                >Tick all that apply. Then use the Priority column to rank them
+                — enter 1 for the most important, 2 for the next, and so on.
+                (Numbers don't need to be perfect — just a rough order.)</span
+              >
+              <div class="goals-list">
+                <div class="goal-row">
+                  <div class="goal-name">
+                    Look professional and trustworthy<small
+                      >First impressions matter — clients, banks, and partners
+                      all check your site.</small
+                    >
+                  </div>
+                  <div class="goal-tick">
+                    <input
+                      type="checkbox"
+                      id="g_prof"
+                      name="C2_Goal_Professional"
+                      value="Yes"
+                      title="Tick if relevant"
+                    />
+                  </div>
+                  <div class="goal-priority">
+                    <label for="gp_prof" style="font-size: 12px"
+                      >Priority:</label
+                    ><input
+                      type="number"
+                      id="gp_prof"
+                      name="C2_Priority_Professional"
+                      min="1"
+                      max="6"
+                      placeholder="—"
+                      title="Enter a priority number"
+                    />
+                  </div>
+                </div>
+                <div class="goal-row">
+                  <div class="goal-name">
+                    Showcase products, services, or past work<small
+                      >Let visitors see what you offer or what you have
+                      done.</small
+                    >
+                  </div>
+                  <div class="goal-tick">
+                    <input
+                      type="checkbox"
+                      id="g_proj"
+                      name="C2_Goal_Projects"
+                      value="Yes"
+                      title="Tick if relevant"
+                    />
+                  </div>
+                  <div class="goal-priority">
+                    <label for="gp_proj" style="font-size: 12px"
+                      >Priority:</label
+                    ><input
+                      type="number"
+                      id="gp_proj"
+                      name="C2_Priority_Projects"
+                      min="1"
+                      max="6"
+                      placeholder="—"
+                    />
+                  </div>
+                </div>
+                <div class="goal-row">
+                  <div class="goal-name">
+                    Attract new customers or clients<small
+                      >Generate enquiries from people who find you
+                      online.</small
+                    >
+                  </div>
+                  <div class="goal-tick">
+                    <input
+                      type="checkbox"
+                      id="g_attr"
+                      name="C2_Goal_Attract"
+                      value="Yes"
+                      title="Tick if relevant"
+                    />
+                  </div>
+                  <div class="goal-priority">
+                    <label for="gp_attr" style="font-size: 12px"
+                      >Priority:</label
+                    ><input
+                      type="number"
+                      id="gp_attr"
+                      name="C2_Priority_Attract"
+                      min="1"
+                      max="6"
+                      placeholder="—"
+                    />
+                  </div>
+                </div>
+                <div class="goal-row">
+                  <div class="goal-name">
+                    Help people contact you easily<small
+                      >Make it simple for any visitor to call or send an
+                      enquiry.</small
+                    >
+                  </div>
+                  <div class="goal-tick">
+                    <input
+                      type="checkbox"
+                      id="g_cont"
+                      name="C2_Goal_Contact"
+                      value="Yes"
+                      title="Tick if relevant"
+                    />
+                  </div>
+                  <div class="goal-priority">
+                    <label for="gp_cont" style="font-size: 12px"
+                      >Priority:</label
+                    ><input
+                      type="number"
+                      id="gp_cont"
+                      name="C2_Priority_Contact"
+                      min="1"
+                      max="6"
+                      placeholder="—"
+                    />
+                  </div>
+                </div>
+                <div class="goal-row">
+                  <div class="goal-name">
+                    Build credibility with partners, investors, or
+                    suppliers<small
+                      >Show that you are established, serious, and have a track
+                      record.</small
+                    >
+                  </div>
+                  <div class="goal-tick">
+                    <input
+                      type="checkbox"
+                      id="g_cred"
+                      name="C2_Goal_Credibility"
+                      value="Yes"
+                      title="Tick if relevant"
+                    />
+                  </div>
+                  <div class="goal-priority">
+                    <label for="gp_cred" style="font-size: 12px"
+                      >Priority:</label
+                    ><input
+                      type="number"
+                      id="gp_cred"
+                      name="C2_Priority_Credibility"
+                      min="1"
+                      max="6"
+                      placeholder="—"
+                    />
+                  </div>
+                </div>
+                <div class="goal-row">
+                  <div class="goal-name">
+                    Something else<small>Describe it in the box below.</small>
+                  </div>
+                  <div class="goal-tick">
+                    <input
+                      type="checkbox"
+                      id="g_othr"
+                      name="C2_Goal_Other"
+                      value="Yes"
+                      title="Tick if relevant"
+                    />
+                  </div>
+                  <div class="goal-priority">
+                    <label for="gp_othr" style="font-size: 12px"
+                      >Priority:</label
+                    ><input
+                      type="number"
+                      id="gp_othr"
+                      name="C2_Priority_Other"
+                      min="1"
+                      max="6"
+                      placeholder="—"
+                    />
+                  </div>
+                </div>
+              </div>
+              <input
+                type="text"
+                name="C2_Other_Goal_Detail"
+                placeholder="If you ticked 'Something else' — describe your goal here…"
+                style="margin-top: 10px"
+              />
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="c3"
+                >If someone visits your website and only does one thing — what
+                would you most want that to be?</label
+              >
+              <span class="q-hint"
+                >This is sometimes called a "call to action" — the single most
+                important thing you want visitors to do.</span
+              >
+              <div class="q-example">
+                Example: "Call me." &nbsp; Or: "Send an enquiry." &nbsp; Or:
+                "Register interest in the project." &nbsp; Or: "Visit the
+                display site."
+              </div>
+              <input
+                type="text"
+                id="c3"
+                name="C3_Call_To_Action"
+                placeholder="e.g. Call us on 04XX XXX XXX — or — Complete an online enquiry form…"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================
+         D — VERSION 1 PAGES
+    ============================================ -->
+        <div class="section-card" id="secD">
+          <div class="section-header">
+            <div class="section-badge">D</div>
+            <div class="section-heading">
+              <h2>The First Version of the Website</h2>
+              <p>Which pages and content do you need to launch with?</p>
+            </div>
+          </div>
+          <div class="section-body">
+            <p
+              style="
+                font-size: 14px;
+                color: var(--text-mid);
+                margin-bottom: 18px;
+              "
+            >
+              Think of the website as a set of building blocks. Each block below
+              is a page or section. Tell us which blocks you want
+              <strong>right now</strong>, which can <strong>wait</strong>, and
+              which you <strong>don't need</strong>. Also tell us what
+              information you already have — and what you still need to prepare.
+            </p>
+
+            <!-- Home Page -->
+            <div class="page-block">
+              <div class="page-block-header">
+                <strong>Home Page</strong>
+                <span
+                  >The first thing people see when they arrive on your
+                  site</span
+                >
+              </div>
+              <div class="page-block-body">
+                <span class="q-hint" style="margin-bottom: 10px"
+                  >Usually includes a short headline, a summary of what you do,
+                  and a clear way to contact you.</span
+                >
+                <div class="when-radio">
+                  <label
+                    ><input
+                      type="radio"
+                      name="D1_Home_When"
+                      value="Include now"
+                    />
+                    Include now</label
+                  >
+                  <label
+                    ><input
+                      type="radio"
+                      name="D1_Home_When"
+                      value="Add later"
+                    />
+                    Add later</label
+                  >
+                  <label
+                    ><input
+                      type="radio"
+                      name="D1_Home_When"
+                      value="Not needed"
+                    />
+                    Not needed</label
+                  >
+                </div>
+                <div class="twin-col">
+                  <div>
+                    <span class="sub-label"
+                      >What do you already have for this page?</span
+                    >
+                    <textarea
+                      name="D1_Home_Have"
+                      style="min-height: 70px"
+                      placeholder="e.g. Logo, short company description, a hero photo…"
+                    ></textarea>
+                  </div>
+                  <div>
+                    <span class="sub-label"
+                      >What do you still need to prepare?</span
+                    >
+                    <textarea
+                      name="D1_Home_Need"
+                      style="min-height: 70px"
+                      placeholder="e.g. A professional headline, a background photo…"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- About / Who We Are -->
+            <div class="page-block">
+              <div class="page-block-header">
+                <strong>About Us / Who We Are</strong>
+                <span
+                  >Your company story, values, and why people should trust
+                  you</span
+                >
+              </div>
+              <div class="page-block-body">
+                <div class="when-radio">
+                  <label
+                    ><input
+                      type="radio"
+                      name="D2_About_When"
+                      value="Include now"
+                    />
+                    Include now</label
+                  >
+                  <label
+                    ><input
+                      type="radio"
+                      name="D2_About_When"
+                      value="Add later"
+                    />
+                    Add later</label
+                  >
+                  <label
+                    ><input
+                      type="radio"
+                      name="D2_About_When"
+                      value="Not needed"
+                    />
+                    Not needed</label
+                  >
+                </div>
+                <div class="twin-col">
+                  <div>
+                    <span class="sub-label">What do you already have?</span>
+                    <textarea
+                      name="D2_About_Have"
+                      style="min-height: 70px"
+                      placeholder="e.g. Company history, team bio, headshot…"
+                    ></textarea>
+                  </div>
+                  <div>
+                    <span class="sub-label">What do you still need?</span>
+                    <textarea
+                      name="D2_About_Need"
+                      style="min-height: 70px"
+                      placeholder="e.g. Written description of the company…"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Projects / Portfolio -->
+            <div class="page-block">
+              <div class="page-block-header">
+                <strong>Work, Projects, or Portfolio</strong>
+                <span>Examples of your work — past or current</span>
+              </div>
+              <div class="page-block-body">
+                <span class="q-hint" style="margin-bottom: 10px"
+                  >Could be case studies, completed jobs, products, services, or
+                  any work you want to showcase.</span
+                >
+                <div class="when-radio">
+                  <label
+                    ><input
+                      type="radio"
+                      name="D3_Projects_When"
+                      value="Include now"
+                    />
+                    Include now</label
+                  >
+                  <label
+                    ><input
+                      type="radio"
+                      name="D3_Projects_When"
+                      value="Add later"
+                    />
+                    Add later</label
+                  >
+                  <label
+                    ><input
+                      type="radio"
+                      name="D3_Projects_When"
+                      value="Not needed"
+                    />
+                    Not needed</label
+                  >
+                </div>
+                <div class="twin-col">
+                  <div>
+                    <span class="sub-label">What do you already have?</span>
+                    <textarea
+                      name="D3_Projects_Have"
+                      style="min-height: 70px"
+                      placeholder="e.g. Project names, photos, case study notes, completion dates…"
+                    ></textarea>
+                  </div>
+                  <div>
+                    <span class="sub-label">What do you still need?</span>
+                    <textarea
+                      name="D3_Projects_Need"
+                      style="min-height: 70px"
+                      placeholder="e.g. Professional photography, written descriptions…"
+                    ></textarea>
+                  </div>
+                </div>
+                <div style="margin-top: 10px">
+                  <span class="sub-label"
+                    >Roughly how many items would you like to show at
+                    launch?</span
+                  >
+                  <input
+                    type="text"
+                    name="D3_Projects_Count"
+                    placeholder="e.g. 3 completed projects + 1 in progress — or — just the most recent 5"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact Page -->
+            <div class="page-block">
+              <div class="page-block-header">
+                <strong>Contact Page</strong>
+                <span
+                  >Your contact details, an enquiry form, and optionally a map
+                  or address</span
+                >
+              </div>
+              <div class="page-block-body">
+                <div class="when-radio">
+                  <label
+                    ><input
+                      type="radio"
+                      name="D4_Contact_When"
+                      value="Include now"
+                    />
+                    Include now</label
+                  >
+                  <label
+                    ><input
+                      type="radio"
+                      name="D4_Contact_When"
+                      value="Add later"
+                    />
+                    Add later</label
+                  >
+                  <label
+                    ><input
+                      type="radio"
+                      name="D4_Contact_When"
+                      value="Not needed"
+                    />
+                    Not needed</label
+                  >
+                </div>
+                <span class="sub-label"
+                  >What contact details should be shown?</span
+                >
+                <textarea
+                  name="D4_Contact_Details"
+                  style="min-height: 70px"
+                  placeholder="e.g. Phone: 04XX XXX XXX, Email: hello@yourbusiness.com.au, Address (if applicable)…"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="q-group" style="margin-top: 16px">
+              <label class="q-label" for="d5"
+                >Are there any other pages or sections you want to include at
+                launch?</label
+              >
+              <span class="q-hint"
+                >Anything not listed above that you feel the site needs right
+                from the start.</span
+              >
+              <textarea
+                id="d5"
+                name="D5_Other_Pages"
+                placeholder="Describe any additional pages or sections here…"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================
+         E — FUTURE PLANS
+    ============================================ -->
+        <div class="section-card" id="secE">
+          <div class="section-header">
+            <div class="section-badge">E</div>
+            <div class="section-heading">
+              <h2>Future Plans and Scalability</h2>
+              <p>
+                No commitment needed — just dreaming a little about what comes
+                next
+              </p>
+            </div>
+          </div>
+          <div class="section-body">
+            <p
+              style="
+                font-size: 14px;
+                color: var(--text-mid);
+                margin-bottom: 18px;
+              "
+            >
+              You've said: <em>"Start simple for now, and expand later."</em>
+              That is a smart approach. This section is only about capturing
+              future ideas &mdash; nothing here is being built right now. Tick
+              anything that sounds interesting for down the track.
+            </p>
+
+            <div class="q-group">
+              <span class="q-label"
+                >Which of these features might interest you in the future?</span
+              >
+              <span class="q-hint"
+                >Tick anything that sounds potentially useful. No pressure to
+                commit to any of it.</span
+              >
+              <div class="check-grid" style="margin-top: 10px">
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="fut_blog"
+                    name="E1_Future[]"
+                    value="News or updates section"
+                  />
+                  <label for="fut_blog"
+                    >News or updates section<span class="sub"
+                      >Post project updates, announcements, or industry
+                      news</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="fut_gallery"
+                    name="E1_Future[]"
+                    value="Full project gallery"
+                  />
+                  <label for="fut_gallery"
+                    >Full project gallery<span class="sub"
+                      >More photos, videos, and walk-through content for each
+                      project</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="fut_downloads"
+                    name="E1_Future[]"
+                    value="Downloads (brochures, floor plans)"
+                  />
+                  <label for="fut_downloads"
+                    >Downloads<span class="sub"
+                      >Brochures, floor plans, PDFs, or fact sheets people can
+                      save</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="fut_testimonials"
+                    name="E1_Future[]"
+                    value="Testimonials or case studies"
+                  />
+                  <label for="fut_testimonials"
+                    >Testimonials or case studies<span class="sub"
+                      >Quotes or stories from satisfied buyers or partners</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="fut_faq"
+                    name="E1_Future[]"
+                    value="FAQ section"
+                  />
+                  <label for="fut_faq"
+                    >FAQ section<span class="sub"
+                      >Answers to questions your clients ask most often</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="fut_enquiry"
+                    name="E1_Future[]"
+                    value="Online enquiry form"
+                  />
+                  <label for="fut_enquiry"
+                    >Online enquiry or booking form<span class="sub"
+                      >Let people express interest or request a meeting
+                      online</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="fut_team"
+                    name="E1_Future[]"
+                    value="Team or partner profiles"
+                  />
+                  <label for="fut_team"
+                    >Team or partner profiles<span class="sub"
+                      >Pages for key people or trusted partners</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="fut_portal"
+                    name="E1_Future[]"
+                    value="Investor portal or private login"
+                  />
+                  <label for="fut_portal"
+                    >Investor portal or private login area<span class="sub"
+                      >A secure section where investors can access project
+                      details</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="fut_newsletter"
+                    name="E1_Future[]"
+                    value="Mailing list or newsletter"
+                  />
+                  <label for="fut_newsletter"
+                    >Mailing list or email newsletter<span class="sub"
+                      >Let interested people subscribe to receive project
+                      updates</span
+                    ></label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="e2"
+                >Have you seen anything on other websites that you liked and
+                might want one day?</label
+              >
+              <span class="q-hint"
+                >Could be a feature, a type of content, a layout, or just a
+                feeling you got from browsing. Even rough notes are
+                helpful.</span
+              >
+              <textarea
+                id="e2"
+                name="E2_Future_Ideas"
+                placeholder="Describe any ideas you've seen elsewhere that you'd like to have in mind for later…"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================
+         F — LOOK AND FEEL
+    ============================================ -->
+        <div class="section-card" id="secF">
+          <div class="section-header">
+            <div class="section-badge">F</div>
+            <div class="section-heading">
+              <h2>Look and Feel</h2>
+              <p>How you want the website to look, feel, and present itself</p>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="q-group">
+              <span class="q-label"
+                >How do you want the website to feel when someone visits
+                it?</span
+              >
+              <span class="q-hint"
+                >Tick all that feel right. Think of the impression you want to
+                leave — like the feeling you get walking into a well-designed
+                display suite or office.</span
+              >
+              <div class="check-grid" style="margin-top: 10px">
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="feel_premium"
+                    name="F1_Feel[]"
+                    value="Premium and high-end"
+                  />
+                  <label for="feel_premium"
+                    >Premium and high-end<span class="sub"
+                      >Polished, quality, carefully considered</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="feel_modern"
+                    name="F1_Feel[]"
+                    value="Modern and clean"
+                  />
+                  <label for="feel_modern"
+                    >Modern and clean<span class="sub"
+                      >Fresh, contemporary, up-to-date</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="feel_professional"
+                    name="F1_Feel[]"
+                    value="Professional and serious"
+                  />
+                  <label for="feel_professional"
+                    >Professional and serious<span class="sub"
+                      >Businesslike, no-nonsense, trustworthy</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="feel_classic"
+                    name="F1_Feel[]"
+                    value="Classic and timeless"
+                  />
+                  <label for="feel_classic"
+                    >Classic and timeless<span class="sub"
+                      >Established, traditional, not trend-driven</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="feel_warm"
+                    name="F1_Feel[]"
+                    value="Warm and approachable"
+                  />
+                  <label for="feel_warm"
+                    >Warm and approachable<span class="sub"
+                      >Friendly, welcoming, easy to connect with</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="feel_minimal"
+                    name="F1_Feel[]"
+                    value="Minimal and simple"
+                  />
+                  <label for="feel_minimal"
+                    >Minimal and simple<span class="sub"
+                      >Clean, no clutter, easy to read</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="feel_bold"
+                    name="F1_Feel[]"
+                    value="Bold and confident"
+                  />
+                  <label for="feel_bold"
+                    >Bold and confident<span class="sub"
+                      >Strong, impactful, makes a statement</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="feel_local"
+                    name="F1_Feel[]"
+                    value="Local and community-focused"
+                  />
+                  <label for="feel_local"
+                    >Local and community-focused<span class="sub"
+                      >Grounded, connected to place and people</span
+                    ></label
+                  >
+                </div>
+              </div>
+              <textarea
+                name="F1_Feel_Other"
+                placeholder="Anything else? Describe the feeling you want in your own words…"
+                style="margin-top: 10px"
+              ></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="f2"
+                >Are there any websites you like the look of? (Property or
+                otherwise.)</label
+              >
+              <span class="q-hint"
+                >Write the website addresses and say briefly what you like about
+                each one — colours, layout, photography, simplicity, etc.</span
+              >
+              <div class="q-example">
+                Example: "I like www.mailchimp.com because it is clean and not
+                overcrowded. I also like how [company].com.au uses big, strong
+                photos across the top."
+              </div>
+              <textarea
+                id="f2"
+                name="F2_Liked_Sites"
+                class="ta-tall"
+                placeholder="Your answer here…"
+              ></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="f3"
+                >Is there anything you specifically do not like on
+                websites?</label
+              >
+              <span class="q-hint"
+                >Be honest — this helps us avoid things that would frustrate you
+                or that you would be embarrassed by.</span
+              >
+              <div class="check-grid" style="margin-top: 8px">
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="dis_text"
+                    name="F3_Dislikes[]"
+                    value="Too much text"
+                  />
+                  <label for="dis_text"
+                    >Too much text<span class="sub"
+                      >Overwhelming, hard to quickly scan</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="dis_anim"
+                    name="F3_Dislikes[]"
+                    value="Lots of animations or moving parts"
+                  />
+                  <label for="dis_anim"
+                    >Lots of animations or moving things<span class="sub"
+                      >Distracting, slows the page down</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="dis_colours"
+                    name="F3_Dislikes[]"
+                    value="Too many colours"
+                  />
+                  <label for="dis_colours"
+                    >Too many colours<span class="sub"
+                      >Looks cheap or difficult to read</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="dis_fonts"
+                    name="F3_Dislikes[]"
+                    value="Hard-to-read fonts"
+                  />
+                  <label for="dis_fonts"
+                    >Fonts that are hard to read<span class="sub"
+                      >Too decorative, too small, or low contrast</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="dis_slow"
+                    name="F3_Dislikes[]"
+                    value="Slow to load"
+                  />
+                  <label for="dis_slow"
+                    >Slow to load<span class="sub"
+                      >Especially on a mobile phone</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="dis_nav"
+                    name="F3_Dislikes[]"
+                    value="Hard to navigate"
+                  />
+                  <label for="dis_nav"
+                    >Hard to find things<span class="sub"
+                      >Confusing menus or no clear structure</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="dis_popups"
+                    name="F3_Dislikes[]"
+                    value="Pop-up windows and banners"
+                  />
+                  <label for="dis_popups"
+                    >Pop-up windows and banners<span class="sub"
+                      >Interruptive messages appearing over the page</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="dis_old"
+                    name="F3_Dislikes[]"
+                    value="Outdated look"
+                  />
+                  <label for="dis_old"
+                    >An outdated look<span class="sub"
+                      >Looks old-fashioned or neglected</span
+                    ></label
+                  >
+                </div>
+              </div>
+              <textarea
+                id="f3"
+                name="F3_Dislikes_Other"
+                placeholder="Any other dislikes not listed above?…"
+                style="margin-top: 10px"
+              ></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <span class="q-label">A few practical style preferences</span>
+              <span class="q-hint"
+                >Choose the option that feels right from each pair. These help
+                us start the design in the right direction.</span
+              >
+
+              <div class="pref-block" style="margin-top: 14px">
+                <p>Overall colour tone:</p>
+                <div class="radio-list">
+                  <div class="r-item">
+                    <input
+                      type="radio"
+                      id="tone_light"
+                      name="F4_Tone"
+                      value="Light and airy (white backgrounds, lots of space)"
+                    />
+                    <label for="tone_light"
+                      >Light and airy<span class="sub"
+                        >White backgrounds, clean and spacious</span
+                      ></label
+                    >
+                  </div>
+                  <div class="r-item">
+                    <input
+                      type="radio"
+                      id="tone_dark"
+                      name="F4_Tone"
+                      value="Dark and rich (dark backgrounds, strong contrast)"
+                    />
+                    <label for="tone_dark"
+                      >Dark and rich<span class="sub"
+                        >Dark backgrounds, striking contrast</span
+                      ></label
+                    >
+                  </div>
+                  <div class="r-item">
+                    <input
+                      type="radio"
+                      id="tone_neutral"
+                      name="F4_Tone"
+                      value="Neutral (warm greys, beige, stone tones)"
+                    />
+                    <label for="tone_neutral"
+                      >Neutral<span class="sub"
+                        >Warm greys, beige, or stone tones — in between</span
+                      ></label
+                    >
+                  </div>
+                  <div class="r-item">
+                    <input
+                      type="radio"
+                      id="tone_any"
+                      name="F4_Tone"
+                      value="No preference — trust the design team"
+                    />
+                    <label for="tone_any"
+                      >No strong preference — I trust the design team</label
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div class="pref-block">
+                <p>Content balance:</p>
+                <div class="radio-list">
+                  <div class="r-item">
+                    <input
+                      type="radio"
+                      id="bal_photos"
+                      name="F4_Balance"
+                      value="Mostly big, impactful photos"
+                    />
+                    <label for="bal_photos"
+                      >Mostly big, impactful photos<span class="sub"
+                        >Let the images do the talking</span
+                      ></label
+                    >
+                  </div>
+                  <div class="r-item">
+                    <input
+                      type="radio"
+                      id="bal_text"
+                      name="F4_Balance"
+                      value="More text and detail"
+                    />
+                    <label for="bal_text"
+                      >More text and detail<span class="sub"
+                        >I want visitors to read and understand</span
+                      ></label
+                    >
+                  </div>
+                  <div class="r-item">
+                    <input
+                      type="radio"
+                      id="bal_both"
+                      name="F4_Balance"
+                      value="A good balance of both"
+                    />
+                    <label for="bal_both"
+                      >A good balance of photos and text</label
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div class="pref-block">
+                <p>Site structure:</p>
+                <div class="radio-list">
+                  <div class="r-item">
+                    <input
+                      type="radio"
+                      id="str_single"
+                      name="F4_Structure"
+                      value="Single scrolling page"
+                    />
+                    <label for="str_single"
+                      >Single scrolling page<span class="sub"
+                        >Everything on one page — simple and fast to
+                        navigate</span
+                      ></label
+                    >
+                  </div>
+                  <div class="r-item">
+                    <input
+                      type="radio"
+                      id="str_multi"
+                      name="F4_Structure"
+                      value="Multiple separate pages"
+                    />
+                    <label for="str_multi"
+                      >Multiple separate pages<span class="sub"
+                        >Each topic gets its own page — better for larger
+                        sites</span
+                      ></label
+                    >
+                  </div>
+                  <div class="r-item">
+                    <input
+                      type="radio"
+                      id="str_any"
+                      name="F4_Structure"
+                      value="No preference — recommend what suits best"
+                    />
+                    <label for="str_any"
+                      >No preference — recommend what suits us best</label
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="f5"
+                >Are there any colours you want to use — or any colours you
+                definitely don't want?</label
+              >
+              <span class="q-hint"
+                >Even a rough description helps — e.g. "something dark blue and
+                gold" or "earthy tones, nothing too bright."</span
+              >
+              <input
+                type="text"
+                id="f5"
+                name="F5_Colours"
+                placeholder="e.g. Navy and gold, or keep existing brand colours, or earthy neutrals…"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================
+         G — PRACTICAL DETAILS
+    ============================================ -->
+        <div class="section-card" id="secG">
+          <div class="section-header">
+            <div class="section-badge">G</div>
+            <div class="section-heading">
+              <h2>Practical Details</h2>
+              <p>The basics we need to get started straight away</p>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="q-group">
+              <span class="q-label"
+                >What do you already have ready to use?</span
+              >
+              <span class="q-hint"
+                >Tick everything you already have. These are the building blocks
+                we can use straight away without extra work.</span
+              >
+              <div class="check-list" style="margin-top: 10px">
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="asset_logo"
+                    name="G1_Have[]"
+                    value="A logo"
+                  />
+                  <label for="asset_logo"
+                    >A logo<span class="sub"
+                      >Ideally a high-resolution PNG or vector file (.ai, .eps,
+                      or .svg)</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="asset_colours"
+                    name="G1_Have[]"
+                    value="Brand colours"
+                  />
+                  <label for="asset_colours"
+                    >Brand colours<span class="sub"
+                      >Specific colours you already use across your marketing
+                      materials</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="asset_photos"
+                    name="G1_Have[]"
+                    value="High-quality project photos"
+                  />
+                  <label for="asset_photos"
+                    >High-quality project photos<span class="sub"
+                      >Professional photography of your developments</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="asset_docs"
+                    name="G1_Have[]"
+                    value="Existing brochures or documents"
+                  />
+                  <label for="asset_docs"
+                    >Existing brochures or marketing documents<span class="sub"
+                      >PDFs, printed brochures, or floor plan documents</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="asset_copy"
+                    name="G1_Have[]"
+                    value="Written content already prepared"
+                  />
+                  <label for="asset_copy"
+                    >Written content already prepared<span class="sub"
+                      >Any text descriptions of the business or projects you've
+                      already written</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="asset_site"
+                    name="G1_Have[]"
+                    value="A current website (if you already have one)"
+                  />
+                  <label for="asset_site"
+                    >A current website (if you already have one)<span
+                      class="sub"
+                      >Content from existing sites can sometimes be reused or
+                      built upon</span
+                    ></label
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <span class="q-label">Do you already own a domain name?</span>
+              <span class="q-hint"
+                >A domain name is your website address — for example,
+                <em>yourbusiness.com.au</em>. If you already have one, we can
+                use it. If not, we will help you register a suitable one.</span
+              >
+              <div class="radio-list" style="margin: 10px 0 12px">
+                <div class="r-item">
+                  <input
+                    type="radio"
+                    id="dom_yes"
+                    name="G2_Domain"
+                    value="Yes — I already have one"
+                  />
+                  <label for="dom_yes">Yes — I already have one</label>
+                </div>
+                <div class="r-item">
+                  <input
+                    type="radio"
+                    id="dom_no"
+                    name="G2_Domain"
+                    value="No — I will need one registered"
+                  />
+                  <label for="dom_no">No — I will need one registered</label>
+                </div>
+                <div class="r-item">
+                  <input
+                    type="radio"
+                    id="dom_unsure"
+                    name="G2_Domain"
+                    value="I am not sure"
+                  />
+                  <label for="dom_unsure">I am not sure</label>
+                </div>
+              </div>
+              <label class="sub-label" for="g2_name" style="margin-top: 4px"
+                >If yes, what is the domain name?</label
+              >
+              <input
+                type="text"
+                id="g2_name"
+                name="G2_Domain_Name"
+                placeholder="e.g. yourbusiness.com.au"
+              />
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <span class="q-label"
+                >How should people contact you through the website?</span
+              >
+              <span class="q-hint"
+                >Tick all the methods you are comfortable displaying publicly on
+                the site.</span
+              >
+              <div class="check-list" style="margin-top: 10px">
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="cm_phone"
+                    name="G3_Contact_Methods[]"
+                    value="Phone number"
+                  />
+                  <label for="cm_phone"
+                    >Phone number<span class="sub"
+                      >Mobile or office landline</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="cm_email"
+                    name="G3_Contact_Methods[]"
+                    value="Email address"
+                  />
+                  <label for="cm_email"
+                    >Email address<span class="sub"
+                      >A dedicated business email — not a personal address if
+                      possible</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="cm_form"
+                    name="G3_Contact_Methods[]"
+                    value="Online contact form"
+                  />
+                  <label for="cm_form"
+                    >Online contact form<span class="sub"
+                      >A form on the site where people type their name, message,
+                      and email</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="cm_wa"
+                    name="G3_Contact_Methods[]"
+                    value="WhatsApp"
+                  />
+                  <label for="cm_wa"
+                    >WhatsApp<span class="sub"
+                      >A WhatsApp chat button linking to your number</span
+                    ></label
+                  >
+                </div>
+                <div class="c-item">
+                  <input
+                    type="checkbox"
+                    id="cm_addr"
+                    name="G3_Contact_Methods[]"
+                    value="Office or postal address"
+                  />
+                  <label for="cm_addr"
+                    >Office or postal address<span class="sub"
+                      >Only if you have a physical office that visitors could
+                      come to</span
+                    ></label
+                  >
+                </div>
+              </div>
+              <textarea
+                name="G3_Contact_Details"
+                placeholder="Please write the actual contact details you want listed (phone number, email address, office address, etc.)…"
+                style="margin-top: 10px"
+              ></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="g4"
+                >Are there any social media pages we should link to from the
+                website? <span class="optional">Optional</span></label
+              >
+              <span class="q-hint"
+                >For example: LinkedIn, Facebook, or Instagram. Write the names
+                or addresses below, or write "None."</span
+              >
+              <input
+                type="text"
+                id="g4"
+                name="G4_Social_Media"
+                placeholder="e.g. LinkedIn: linkedin.com/company/yourbusiness — or — None at this stage"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================
+         H — QUESTIONS AND CONCERNS
+    ============================================ -->
+        <div class="section-card" id="secH">
+          <div class="section-header">
+            <div class="section-badge">H</div>
+            <div class="section-heading">
+              <h2>Your Questions and Concerns</h2>
+              <p>An open space — write anything that comes to mind</p>
+            </div>
+          </div>
+          <div class="section-body">
+            <p
+              style="
+                font-size: 14px;
+                color: var(--text-mid);
+                margin-bottom: 22px;
+              "
+            >
+              This section has no wrong answers. Write whatever is on your mind.
+              Any concern, question, or thing you want to flag is useful. If
+              something earlier in this form was unclear, write that here too.
+            </p>
+
+            <div class="q-group">
+              <label class="q-label" for="h1"
+                >Do you have any questions about how the website will be built,
+                what it will cost, or how long it will take?</label
+              >
+              <textarea
+                id="h1"
+                name="H1_Questions"
+                class="ta-tall"
+                placeholder="Write any questions here — nothing is too basic. If you are not sure, just write it down…"
+              ></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="h2"
+                >Are there any concerns or worries you have about this
+                project?</label
+              >
+              <span class="q-hint"
+                >For example: worries about how long it will take, about ongoing
+                maintenance, about the site looking outdated, etc.</span
+              >
+              <textarea
+                id="h2"
+                name="H2_Concerns"
+                class="ta-tall"
+                placeholder="Write any concerns here — being honest helps us plan and communicate better from the start…"
+              ></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="h3"
+                >Is there anything you definitely do NOT want on the
+                website?</label
+              >
+              <span class="q-hint"
+                >Hard limits or things that would make you uncomfortable. No
+                detail is too small.</span
+              >
+              <div class="q-example">
+                Example: "No stock photos of generic people — only real project
+                images." &nbsp; Or: "No pricing listed publicly." &nbsp; Or:
+                "Nothing that looks flashy or over-designed."
+              </div>
+              <textarea
+                id="h3"
+                name="H3_Definitely_Not"
+                class="ta-tall"
+                placeholder="Write any firm 'no' items here…"
+              ></textarea>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="q-group">
+              <label class="q-label" for="h4"
+                >Is there anything else you would like to mention that did not
+                fit anywhere above?</label
+              >
+              <textarea
+                id="h4"
+                name="H4_Anything_Else"
+                class="ta-tall"
+                placeholder="Any final thoughts, ideas, or things you want us to know…"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hidden metadata fields for FormSpree -->
+        <input
+          type="hidden"
+          name="_subject"
+          id="field_subject"
+          value="Website Brief"
+        />
+        <input type="hidden" name="_replyto" id="field_replyto" value="" />
+        <input type="hidden" name="_next" value="" />
+      </form>
+
+      <!-- SUCCESS BANNER -->
+      <div class="success-banner" id="successBanner">
+        <h3>Answers submitted successfully ✓</h3>
+        <p>
+          Your web developer has received your answers and will be in touch
+          shortly. Thank you for taking the time to complete this.
+        </p>
+      </div>
+    </main>
+
+    <!-- ================================================
+     STICKY ACTION BAR
+================================================ -->
+    <div class="action-bar" id="actionBar">
+      <div class="ab-status" id="abStatus">
+        💾 Answers are auto-saved as you type.
+      </div>
+      <button type="button" class="btn btn-ghost" onclick="clearAllAnswers()">
+        Clear all
+      </button>
+      <button type="button" class="btn btn-ghost" onclick="window.print()">
+        🖨&nbsp; Print / Save as PDF
+      </button>
+      <button type="button" class="btn btn-gold" onclick="openSubmitModal()">
+        Submit answers &rarr;
+      </button>
+    </div>
+
+    <!-- ================================================
+     SUBMIT MODAL
+================================================ -->
+    <div
+      class="modal-overlay"
+      id="submitModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modalHeading"
+    >
+      <div class="modal">
+        <h2 id="modalHeading">Ready to submit your answers?</h2>
+        <p>
+          Your completed checklist will be sent directly to your web developer.
+          Before you submit, make sure you have filled in as much as you can —
+          even rough notes are useful.
+        </p>
+        <p>
+          After submitting, a full summary of your answers will pop up
+          automatically &mdash; you can print it, save it as a PDF, or copy the
+          text for your own records.
+        </p>
+        <p>
+          Add your email address below so your developer can follow up with you
+          directly.
+        </p>
+        <div class="email-field">
+          <label for="submitterEmail"
+            >Your email address
+            <span style="font-weight: 400; color: var(--text-soft)"
+              >(optional)</span
+            ></label
+          >
+          <input
+            type="email"
+            id="submitterEmail"
+            placeholder="yourname@email.com"
+          />
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-gold" onclick="submitBrief()">
+            Send my answers
+          </button>
+          <button
+            type="button"
+            class="btn btn-ghost"
+            onclick="closeSubmitModal()"
+          >
+            Go back and check
+          </button>
+        </div>
+        <p class="privacy-note">
+          Your answers are sent securely only to your developer. They are not
+          stored, shared, or used for any other purpose.
+        </p>
+      </div>
+    </div>
+
+    <!-- ================================================
+     TOAST
+================================================ -->
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <!-- ================================================
+     FOOTER
+================================================ -->
+    <footer class="site-footer">
+      <p>Website Brief &nbsp;&middot;&nbsp; All information is confidential</p>
+    </footer>
+
+    <!-- ================================================
+     JAVASCRIPT
+================================================ -->
+    <!-- EmailJS SDK — sends a copy of the brief to the client's inbox -->
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"
+    ></script>
+    <script src="brief.js"></script>
+  </body>
+</html>
