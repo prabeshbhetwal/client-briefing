@@ -1,6 +1,6 @@
 # Website Brief Tool
 
-A client-facing website briefing tool for freelance web developers. Clients fill out a multi-section form covering their business, goals, design preferences, and practical details — then submit it to send their answers directly to the developer's inbox, while also receiving a formatted copy by email.
+A client-facing website briefing tool for freelance web developers. Clients fill out a multi-section form covering their business, goals, design preferences, and practical details, then submit it to send their answers directly to the developer's inbox, while also receiving a formatted copy by email.
 
 ## Features
 
