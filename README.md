@@ -9,6 +9,7 @@ A client-facing website briefing tool for freelance web developers. Clients fill
 - **Email delivery (Formspree)** — on submit, all answers are sent to the developer's inbox
 - **Client email copy (EmailJS)** — a formatted copy of the brief is emailed back to the client
 - **Summary window** — a printable/copyable summary pops up automatically after submission
+- **Interactive planning guides** — client-facing guides with answer fields, progress tracking, recommendations, visual references, and Formspree submission
 - **No build step** — plain HTML + vanilla JS, open `index.html` directly in a browser
 
 ## Files
@@ -17,6 +18,10 @@ A client-facing website briefing tool for freelance web developers. Clients fill
 |------|---------|
 | `index.html` | Full form UI and all styling |
 | `brief.js` | Form logic, save/load, submission, EmailJS integration |
+| `client-question-guide.html` | Client-facing website planning question guide |
+| `bayview-question-guide.html` | Client-facing Bayview Corp website planning guide |
+| `question-guides.css` | Shared styling for the two question guide pages |
+| `question-guides.js` | Shared guide interactions, progress tracking, answer fields, and submission |
 
 ## Setup
 
