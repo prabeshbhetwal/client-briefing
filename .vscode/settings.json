@@ -4,6 +4,8 @@
     "**/*.scss",
     "**/*.sass",
     "**/*.ts",
-    ".git/**"
-  ]
+    ".git/**",
+    "**/.git/**"
+  ],
+  "git.autofetch": false
 }
