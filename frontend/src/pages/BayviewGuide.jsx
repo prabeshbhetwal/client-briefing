@@ -1,5 +1,27 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import '../index.css';
+import { GIF_URIS } from '../gifUris';
+
+// ── Action bar button styles (inline — immune to CSS specificity/caching) ─────
+const BTN = {
+  minHeight: '38px',
+  padding: '8px 18px',
+  border: '1.5px solid #b8a98a',
+  borderRadius: '8px',
+  background: '#ede8de',
+  color: '#18202b',
+  fontSize: '13px',
+  fontWeight: 600,
+  whiteSpace: 'nowrap',
+  cursor: 'pointer',
+  fontFamily: 'inherit',
+};
+const BTN_PRIMARY = {
+  ...BTN,
+  background: '#f1d491',
+  border: '1.5px solid #c9a84c',
+  fontWeight: 700,
+};
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const GUIDE_CONFIG = {
@@ -33,14 +55,14 @@ const BRIEF_SUMMARY = {
   budget: 'Not specified',
 };
 
-// ── Visual library (same data, reused from ClientGuide) ───────────────────────
+// ── Visual library — GIF-based, all animated ─────────────────────────────────
 const VISUAL_LIBRARY = {
   identity: {
     title: 'How business identity appears on a website',
     intro: 'Think of two things: what visitors read when they land (your brand name, tagline, tone), and what sits behind the scenes in legal/footer text. Both need to be confirmed before anything is built.',
-    images: [
-      { src: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=760&q=78', label: 'What visitors see first', caption: 'Your name, a short tagline, and a professional image. This is the impression Bayview Corp will make within 3 seconds.' },
-      { src: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=760&q=78', label: 'Legal and footer details', caption: 'ABN, registered business name, and contact details usually sit in the footer. They need to be accurate.' },
+    gifs: [
+      { src: GIF_URIS.identity, label: 'First impression', caption: 'Your name, a short tagline, and a professional image — this is the impression Bayview Corp will make within 3 seconds.' },
+      { src: GIF_URIS.identity, label: 'Legal and footer details', caption: 'ABN, registered business name, and contact details sit in the footer. They need to be accurate and consistent with your domain.' },
     ],
     chart: [['First impression clarity', 92], ['Visitor trust', 78], ['Legal accuracy', 88]],
     compare: [['Clear', 'One consistent name on the website, domain, and business email builds trust.'], ['Confusing', 'Different names in different places make visitors uncertain which business they are dealing with.']],
@@ -48,9 +70,9 @@ const VISUAL_LIBRARY = {
   positioning: {
     title: 'What "positioning" means for Bayview',
     intro: 'Positioning answers the question: "What makes Bayview Corp different from other property developers?" A visitor who lands on the homepage should understand the answer within 10 seconds, without reading the whole page.',
-    images: [
-      { src: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=760&q=78', label: 'Boutique and founder-led', caption: 'A personal touch and a clear niche (boutique, premium, residential) is often more convincing than a generic "we do everything" message.' },
-      { src: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=760&q=78', label: 'Track record and specialist focus', caption: 'Showing specific experience — property type, suburb, deal type — tells visitors you know the market.' },
+    gifs: [
+      { src: GIF_URIS.positioning, label: 'Boutique and founder-led', caption: 'A clear niche (boutique, premium, residential) is more convincing than a generic "we do everything" message.' },
+      { src: GIF_URIS.positioning, label: 'Track record and specialist focus', caption: 'Showing specific experience — property type, suburb, deal type — tells visitors you know the market.' },
     ],
     chart: [['Clarity of purpose', 88], ['Differentiation', 74], ['Memorability', 65]],
     compare: [['Strong positioning', 'A visitor can explain what Bayview does after one screen.'], ['Weak positioning', 'The site looks premium but could belong to any developer.']],
@@ -58,9 +80,9 @@ const VISUAL_LIBRARY = {
   audience: {
     title: 'Who should the Bayview website speak to first?',
     intro: 'Your brief mentioned property owners/landowners and property buyers. These two groups need different information. Choosing which one the homepage speaks to first makes the writing much more effective.',
-    images: [
-      { src: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=760&q=78', label: 'Landowner or property owner', caption: 'They want to know: "Is Bayview trustworthy? Do they know the market I am selling into? What is the process?"' },
-      { src: 'https://images.unsplash.com/photo-1556761175-4b46a572b786?auto=format&fit=crop&w=760&q=78', label: 'Property buyer', caption: 'They want to know: "What is available? Where are the projects? How do I register interest?"' },
+    gifs: [
+      { src: GIF_URIS.audience, label: 'Landowner or property owner', caption: 'They want to know: "Is Bayview trustworthy? Do they know the market I am selling into? What is the process?"' },
+      { src: GIF_URIS.audience, label: 'Property buyer', caption: 'They want to know: "What is available? Where are the projects? How do I register interest?"' },
     ],
     chart: [['Landowner trust signals', 90], ['Buyer project information', 78], ['General brand awareness', 55]],
     compare: [['Pick one first', 'Write the homepage for the landowner (or buyer), then use the Projects page for the other.'], ['Write for everyone', 'Trying to speak to both groups equally weakens the message for both.']],
@@ -68,9 +90,9 @@ const VISUAL_LIBRARY = {
   market: {
     title: 'What "target markets" looks like on a property website',
     intro: 'In property development, "target markets" usually means locations and property types. Your brief mentioned you want to update the site with brief information on target markets. This becomes a section or page called "Market Focus" or "Where We Work".',
-    images: [
-      { src: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742?auto=format&fit=crop&w=760&q=78', label: 'Location and suburb focus', caption: 'Examples: "Sydney Lower North Shore", "Northern Beaches", "Eastern Suburbs, high-density residential". Naming these tells visitors where you operate.' },
-      { src: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=760&q=78', label: 'Property and deal type focus', caption: 'Examples: "Boutique residential apartments", "5–20 unit sites", "Landowner joint ventures". This tells visitors the type of opportunity you are pursuing.' },
+    gifs: [
+      { src: GIF_URIS.market, label: 'Location and suburb focus', caption: 'Naming specific Sydney suburbs or regions gives visitors immediate context about where Bayview operates.' },
+      { src: GIF_URIS.market, label: 'Property and deal type focus', caption: '"Boutique residential apartments", "5–20 unit sites", "Landowner joint ventures" — these tell visitors exactly what opportunities Bayview pursues.' },
     ],
     chart: [['Location clarity', 86], ['Deal type clarity', 78], ['Frequency of updates', 58]],
     compare: [['Specific and named', '"We focus on boutique residential development in Sydney\'s Northern Beaches and Lower North Shore."'], ['Too vague', '"We focus on premium property across Sydney." — This tells visitors very little.']],
@@ -78,9 +100,9 @@ const VISUAL_LIBRARY = {
   services: {
     title: 'How a services section works on a property development website',
     intro: 'A "services" section for a developer is less about listing every task, and more about explaining how Bayview works and who it works with. Keep it to 3–5 services at most for the first version.',
-    images: [
-      { src: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=760&q=78', label: 'Development delivery', caption: 'The main story: acquiring sites, managing development, delivering finished properties.' },
-      { src: 'https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?auto=format&fit=crop&w=760&q=78', label: 'Landowner partnerships and joint ventures', caption: 'A specific callout for landowners who may want to work with Bayview rather than sell outright.' },
+    gifs: [
+      { src: GIF_URIS.services, label: 'Development delivery', caption: 'The main story: acquiring sites, managing development, delivering finished properties.' },
+      { src: GIF_URIS.services, label: 'Landowner partnerships', caption: 'A specific callout for landowners who may want to work with Bayview rather than sell outright.' },
     ],
     chart: [['Core service clarity', 88], ['Supporting service relevance', 62], ['Sensitive detail risk', 44]],
     compare: [['Focused service list', 'List 3–5 services that describe how you work. Visitors understand quickly.'], ['Everything listed', 'A long service list dilutes the premium feel and makes it harder for visitors to know what to do.']],
@@ -88,9 +110,9 @@ const VISUAL_LIBRARY = {
   projects: {
     title: 'How an editable Projects section works',
     intro: 'This is the section you will manage yourself after the site is built. Think of it like a simple database: you add a project entry, fill in a few fields, upload photos, and it appears on the website. You can also hide a project until it is ready.',
-    images: [
-      { src: 'https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=760&q=78', label: 'What a completed project entry looks like', caption: 'Name, suburb, status (Completed / Current / Coming Soon), a featured image, and a short description.' },
-      { src: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=760&q=78', label: 'A draft or hidden project', caption: 'You can save a project entry privately — it exists in your editor but is not shown publicly until you turn it on.' },
+    gifs: [
+      { src: GIF_URIS.projects, label: 'What a completed project entry looks like', caption: 'Name, suburb, status (Completed / Current / Coming Soon), a featured image, and a short description.' },
+      { src: GIF_URIS.projects, label: 'A draft or hidden project', caption: 'You can save a project entry privately — it exists in your editor but is not shown publicly until you turn it on.' },
     ],
     chart: [['High-quality photography', 94], ['Consistent fields per project', 80], ['Private draft option', 70]],
     compare: [['Structured entries', 'Every project uses the same fields (name, suburb, status, image, description). The site looks consistent even as you add more.'], ['Unstructured entries', 'Different details per project can look messy and make the site feel inconsistent.']],
@@ -98,9 +120,9 @@ const VISUAL_LIBRARY = {
   proof: {
     title: 'Why trust proof matters more than premium design',
     intro: '"Trust proof" is the evidence that backs up the claims on the website. Premium design makes a good first impression, but visitors who are considering a significant property decision will look for reasons to believe the business is capable and reliable.',
-    images: [
-      { src: 'https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=760&q=78', label: 'Completed projects as evidence', caption: 'A completed project entry with real photos, location, and outcome is more convincing than saying "experienced developer".' },
-      { src: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=760&q=78', label: 'Real people and credentials', caption: 'A founder profile, team background, or connection to Vin Commercial (if appropriate) adds credibility that a logo alone cannot.' },
+    gifs: [
+      { src: GIF_URIS.proof, label: 'Completed projects as evidence', caption: 'A completed project entry with real photos, location, and outcome is more convincing than saying "experienced developer".' },
+      { src: GIF_URIS.proof, label: 'Real people and credentials', caption: 'A founder profile, team background, or connection to Vin Commercial (if appropriate) adds credibility that a logo alone cannot.' },
     ],
     chart: [['Completed project proof', 94], ['Real founder or team profile', 78], ['Generic "we are trusted" copy', 22]],
     compare: [['Proof-led', 'The website shows completed work, real people, and verifiable credentials. Visitors leave with reasons to trust.'], ['Claim-led', 'The website says "trusted", "experienced", "premium" but shows nothing to back it up. Visitors are sceptical.']],
@@ -108,9 +130,9 @@ const VISUAL_LIBRARY = {
   permissions: {
     title: 'What needs approval before it goes on the website',
     intro: 'Before any project photo, partner name, client testimonial, or financial claim goes on the website, it should be checked and approved. This is not about being cautious for the sake of it — it protects Bayview from embarrassing corrections after launch.',
-    images: [
-      { src: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=760&q=78', label: 'Approved and cleared for publication', caption: 'Anything you own the rights to or have permission to use. Your own project photos, your own company description, your own ABN.' },
-      { src: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=760&q=78', label: 'Needs review before publishing', caption: 'Partner names, joint venture details, quotes from other people, renders from builders or architects, or any financial claims.' },
+    gifs: [
+      { src: GIF_URIS.permissions, label: 'Approved and cleared for publication', caption: 'Anything you own the rights to or have permission to use. Your own project photos, your own company description, your own ABN.' },
+      { src: GIF_URIS.permissions, label: 'Needs review before publishing', caption: 'Partner names, joint venture details, quotes from other people, renders from builders or architects, or any financial claims.' },
     ],
     chart: [['Cleared to publish', 88], ['Needs owner permission', 55], ['Should not be published', 18]],
     compare: [['Safe approach', 'Only publish what you own or have permission to use. Get written approval for partner or client mentions.'], ['Risky approach', 'Publishing partner names or claims without permission can create disputes after launch.']],
@@ -118,9 +140,9 @@ const VISUAL_LIBRARY = {
   domain: {
     title: 'How domain and business email registration works',
     intro: 'A domain is your website address (e.g. bayviewcorp.com.au). A business email is an address that matches it (e.g. navin@bayviewcorp.com.au). Both are straightforward to register — the key is making sure they are registered under Bayview\'s business details, not under a personal account that could be hard to access later.',
-    images: [
-      { src: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=760&q=78', label: 'Domain registration', caption: 'For .com.au you need an eligible Australian business: an ABN, ACN, or trademark. The domain should be registered in Bayview\'s name, not a personal name.' },
-      { src: 'https://images.unsplash.com/photo-1586953208448-b95a79798f07?auto=format&fit=crop&w=760&q=78', label: 'Matching business email', caption: 'navin@bayviewcorp.com.au looks far more professional than a personal Gmail or Outlook address when receiving enquiries.' },
+    gifs: [
+      { src: GIF_URIS.domain, label: 'Domain registration', caption: 'For .com.au you need an eligible Australian business: an ABN, ACN, or trademark. The domain should be registered in Bayview\'s name, not a personal name.' },
+      { src: GIF_URIS.domain, label: 'Matching business email', caption: 'navin@bayviewcorp.com.au looks far more professional than a personal Gmail or Outlook address when receiving enquiries.' },
     ],
     chart: [['Professional trust', 88], ['Easy to remember', 76], ['Registration effort', 40]],
     compare: [['Professional setup', 'Bayview owns bayviewcorp.com.au and receives enquiries at a matching business email.'], ['Less polished', 'A public website but with a personal email address — visitors may question the formality of the business.']],
@@ -128,9 +150,9 @@ const VISUAL_LIBRARY = {
   action: {
     title: 'What happens after someone finds the Bayview website',
     intro: 'The goal of any business website is to make the next step obvious. For Bayview, that next step is an enquiry — from a landowner, a buyer, or a partner. The website should make it easy and low-pressure to reach out.',
-    images: [
-      { src: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=760&q=78', label: 'Contact form enquiry', caption: 'A short form on the Contact page captures name, email, phone, and message. It lands in the inbox you nominate.' },
-      { src: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=760&q=78', label: 'Phone or direct conversation', caption: 'Some visitors prefer a call. Showing a phone number alongside the form gives them the choice.' },
+    gifs: [
+      { src: GIF_URIS.action, label: 'Contact form enquiry', caption: 'A short form on the Contact page captures name, email, phone, and message. It lands in the inbox you nominate.' },
+      { src: GIF_URIS.action, label: 'Phone or direct conversation', caption: 'Some visitors prefer a call. Showing a phone number alongside the form gives them the choice.' },
     ],
     chart: [['Enquiry ease', 94], ['Lead intent quality', 72], ['Visitor effort required', 28]],
     compare: [['Clear next step', 'Contact button in the main navigation, a short form, and a phone number. Visitors know exactly how to reach you.'], ['Unclear next step', 'No visible contact details. Interested visitors leave without reaching out.']],
@@ -138,12 +160,42 @@ const VISUAL_LIBRARY = {
   setup: {
     title: 'Who should own the Bayview website accounts',
     intro: 'When a website is built, several accounts are created — the domain registrar, the hosting provider, and the editing screen login. These should all be owned by Bayview Corp, not by the developer. If the developer holds the accounts and moves on, it becomes difficult to manage the website independently.',
-    images: [
-      { src: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=760&q=78', label: 'Business-owned accounts', caption: 'Domain registrar account, hosting account, and the Projects editor login should all be under Bayview\'s email and details.' },
-      { src: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=760&q=78', label: 'Enquiry destination', caption: 'The contact form sends messages to the email address you choose. Make sure this is checked regularly.' },
+    gifs: [
+      { src: GIF_URIS.setup, label: 'Business-owned accounts', caption: 'Domain registrar account, hosting account, and the Projects editor login should all be under Bayview\'s email and details.' },
+      { src: GIF_URIS.setup, label: 'Enquiry destination', caption: 'The contact form sends messages to the email address you choose. Make sure this is checked regularly.' },
     ],
     chart: [['Ownership clarity', 94], ['Long-term control', 88], ['Handover risk', 18]],
     compare: [['Clean ownership', 'Bayview controls the domain, the Projects editor, and the inbox where enquiries arrive.'], ['Risky setup', 'Accounts sit under someone else — if access is lost, regaining control can be slow and difficult.']],
+  },
+  content: {
+    title: 'What content Bayview needs to supply before the build starts',
+    intro: 'A website can only be as good as the content inside it. The developer can build the structure and design, but the words, photos, and business details must come from you. The clearer these are upfront, the faster the build.',
+    gifs: [
+      { src: GIF_URIS.content, label: 'Brand assets ready to hand over', caption: 'Logo file (SVG or high-resolution PNG), brand colours (hex codes if known), and any existing marketing collateral.' },
+      { src: GIF_URIS.content, label: 'Written copy and project descriptions', caption: 'The About page, service descriptions, and project summaries — even rough drafts — are easier to refine than to write from scratch.' },
+    ],
+    chart: [['Logo and brand assets', 90], ['Project photos ready', 55], ['Written copy drafted', 40]],
+    compare: [['Assets ready', 'Build can start immediately. Developer polishes copy and optimises images.'], ['Assets pending', 'Build stalls waiting on content. Launch date slips.']],
+  },
+  timeline: {
+    title: 'How project timelines and budgets work in web development',
+    intro: 'The two questions most clients leave until last are timeline and budget — but they are the ones that shape every other decision. Knowing both upfront means the developer can scope accurately and you get exactly what you expect, with no surprises.',
+    gifs: [
+      { src: GIF_URIS.timeline, label: 'Realistic timeline expectations', caption: 'A polished marketing website with a Projects editor typically takes 4–8 weeks from confirmed content to launch. The main delay is always waiting for content, not building.' },
+      { src: GIF_URIS.timeline, label: 'Budget scope and trade-offs', caption: 'A clear budget lets the developer tell you exactly what is included and what is out of scope — no vague estimates, no surprises.' },
+    ],
+    chart: [['Content ready on time', 85], ['Budget confirmed early', 78], ['Scope changes mid-build', 30]],
+    compare: [['Clear brief + budget', 'Faster build, no scope creep, confident developer, satisfied client.'], ['Vague scope + no budget', 'Slower build, unexpected costs, frustration on both sides.']],
+  },
+  design: {
+    title: 'How the design approval process works',
+    intro: 'Before any code is written, the developer produces a visual design — usually a mockup or prototype — showing what the website will look like. This is the point where feedback is easiest and cheapest. Changes after the build starts take significantly longer.',
+    gifs: [
+      { src: GIF_URIS.design, label: 'Design mockup stage', caption: 'A visual layout showing page structure, colours, fonts, and imagery placement — before a single line of code is written.' },
+      { src: GIF_URIS.design, label: 'Feedback and approval', caption: 'Two rounds of design revisions are standard. Major structural changes after approval extend the timeline and may affect cost.' },
+    ],
+    chart: [['Design approval clarity', 88], ['Revision rounds (standard)', 66], ['Cost of post-build changes', 85]],
+    compare: [['Feedback at design stage', 'Fast, free, easy. A comment like "move this up" takes minutes to implement.'], ['Feedback after build', 'Slow and costly. The same change may require rebuilding multiple components.']],
   },
 };
 
@@ -169,6 +221,15 @@ const VISUAL_TYPE_MAP = {
   'b-domain-2': 'setup',
   'b-domain-3': 'action',
   'b-domain-4': 'domain',
+  // Step 7 — content assets
+  'b-content-1': 'content',
+  'b-content-2': 'content',
+  'b-content-3': 'content',
+  // Step 8 — timeline, budget, design
+  'b-timeline-1': 'timeline',
+  'b-timeline-2': 'timeline',
+  'b-timeline-3': 'design',
+  'b-timeline-4': 'design',
 };
 
 // ── Section and question data ─────────────────────────────────────────────────
@@ -390,6 +451,80 @@ const SECTIONS = [
       },
     ],
   },
+  {
+    id: 'content',
+    kicker: 'Step 7',
+    heading: 'Content and brand assets',
+    description: 'The developer builds the structure — but the words, photos, logo, and business details must come from Bayview. The clearer and earlier these are provided, the faster and better the build goes. This section identifies exactly what is needed before work starts.',
+    callout: 'Speed tip: Projects with content ready at the start consistently launch 2–3 weeks faster than those waiting on assets mid-build.',
+    questions: [
+      {
+        id: 'b-content-1',
+        heading: 'Does Bayview Corp have a logo file ready to use?',
+        detail: 'The logo is needed for the website header, the browser tab, email footers, and any PDF materials. The ideal format is an SVG or a high-resolution PNG with a transparent background. If Bayview does not yet have a final logo, let the developer know — a placeholder can be used during the build and swapped in when the final file is ready.',
+        priority: 'Critical',
+        briefStatus: 'missing',
+        hint: 'Example answer: "Yes — we have a final SVG logo file. I will send it over." or "No final logo yet — we are working on branding. Please use a placeholder."',
+      },
+      {
+        id: 'b-content-2',
+        heading: 'What professional photos does Bayview have ready to use on the website?',
+        detail: 'Photos are the single most impactful element of a premium property website. The types needed are: exterior and interior shots of completed or current projects, a professional headshot of Navin for the About page (if a founder profile is included), and any architect renders for projects still in development. Phone photos are not suitable for a premium impression. If photos are not yet ready, a build can begin with placeholders — but the final website will need real imagery.',
+        priority: 'Critical',
+        briefStatus: 'missing',
+        hint: 'Example answer: "We have professional photos for one completed project and renders for one current project. Navin headshot is available. No phone photos."',
+      },
+      {
+        id: 'b-content-3',
+        heading: 'How much written copy does Bayview have ready?',
+        detail: 'Written copy means the actual text that goes on the website — the About page background, the service descriptions, the project summaries, and any taglines. Even rough draft notes are easier to refine than starting from nothing. The developer can help shape the copy from draft notes, but the factual content — what Bayview does, where it operates, Navin\'s background — must come from Bayview. What stage is the writing at?',
+        priority: 'Recommended',
+        briefStatus: 'missing',
+        hint: 'Example answer: "I have rough notes on the About page and a one-paragraph company overview. No service descriptions yet. Happy to write them with guidance."',
+      },
+    ],
+  },
+  {
+    id: 'timeline',
+    kicker: 'Step 8',
+    heading: 'Timeline, budget, and design approval',
+    description: 'These are often the last questions clients answer — but they are the ones that make every other decision concrete. A clear timeline and budget means the developer can scope accurately, give you an honest estimate, and hold to it. The design approval process ensures no surprises after the build starts.',
+    callout: null,
+    questions: [
+      {
+        id: 'b-timeline-1',
+        heading: 'When would Bayview like the website to be live?',
+        detail: 'A polished marketing website with a Projects editor typically takes 4–8 weeks from confirmed content and brief to launch. The main factor that extends this is waiting on content — photos, copy, and logo. If you have a target date (e.g. for a launch event, an acquisition campaign, or a business registration milestone), share it now so the developer can plan accordingly. If no date is set yet, that is also fine — it just means the timeline will be driven by when content is ready.',
+        priority: 'Critical',
+        briefStatus: 'missing',
+        hint: 'Example answer: "We want to be live by the end of July 2025, before our next landowner outreach campaign." or "No fixed date — ready when it is ready and done properly."',
+      },
+      {
+        id: 'b-timeline-2',
+        heading: 'What is the approximate budget for the website?',
+        detail: 'A budget does not need to be a precise number — a range is fine. It lets the developer tell you exactly what is included, what is out of scope, and where trade-offs exist. Without a budget, estimates are vague and expectations can diverge. For context: a polished marketing website with a Projects editor and professional setup typically sits in the $3,500–$7,000 range depending on scope, content readiness, and the number of revision rounds. Is there a budget range in mind?',
+        priority: 'Critical',
+        briefStatus: 'missing',
+        hint: 'Example answer: "Budget is approximately $5,000–$6,500. Open to discussion if the scope justifies it."',
+      },
+      {
+        id: 'b-timeline-3',
+        heading: 'Who at Bayview will review and approve the design mockup?',
+        detail: 'Before any code is written, the developer produces a visual mockup — showing layout, colours, fonts, and imagery placement. This is the most important approval point. Changes at the mockup stage are fast and free. Changes after the build has started can extend the timeline significantly. Confirm who the decision-maker is for the design: is it Navin alone, or will others need to be consulted before approval?',
+        priority: 'Critical',
+        briefStatus: 'missing',
+        hint: 'Example answer: "Navin alone — one decision-maker. Approval can be given within a week of receiving the mockup."',
+      },
+      {
+        id: 'b-timeline-4',
+        heading: 'How many rounds of revision are you expecting before signing off?',
+        detail: 'Most website builds include two rounds of structured feedback — one after the design mockup, and one after the first working version. Additional revision rounds can extend the timeline and may affect cost. If there are specific areas you anticipate wanting to review carefully (e.g. the homepage layout, the About page tone, the Projects section display), it helps to know this upfront. What are your expectations for the revision process?',
+        priority: 'Recommended',
+        briefStatus: 'missing',
+        hint: 'Example answer: "Two rounds should be enough if the mockup is clearly communicated upfront. I will consolidate all feedback in one document per round."',
+      },
+    ],
+  },
 ];
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -474,20 +609,69 @@ function buildHtmlSummary(answers, checked, textSummary, submitterEmail) {
 }
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
+function GifCard({ gif }) {
+  const [lightbox, setLightbox] = useState(false);
+  return (
+    <>
+      <figure
+        className="visual-card"
+        onClick={() => setLightbox(true)}
+        style={{ cursor: 'pointer', position: 'relative' }}
+        role="button"
+        tabIndex={0}
+        onKeyDown={e => e.key === 'Enter' && setLightbox(true)}
+        aria-label={'Enlarge: ' + gif.label}
+      >
+        <div style={{ position: 'absolute', top: 6, right: 8, fontSize: '11px', color: '#b8a060', opacity: 0, transition: 'opacity 0.18s' }} className="gif-expand-hint">🔍 Enlarge</div>
+        <img loading="lazy" decoding="async" src={gif.src} alt={gif.label} style={{ borderRadius: '6px', width: '100%' }} />
+        <strong>{gif.label}</strong>
+        <span>{gif.caption}</span>
+      </figure>
+      {lightbox && (
+        <div
+          onClick={() => setLightbox(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9000, background: 'rgba(5,10,20,0.9)',
+            backdropFilter: 'blur(10px)', display: 'flex', alignItems: 'center',
+            justifyContent: 'center', cursor: 'zoom-out', animation: 'fadeIn 0.2s ease',
+          }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{
+              maxWidth: 'min(640px, 92vw)', background: '#0f1520', borderRadius: '14px',
+              border: '1.5px solid rgba(184,150,43,0.35)', padding: '16px', position: 'relative',
+              animation: 'pop 0.22s cubic-bezier(0.34,1.56,0.64,1) both',
+            }}
+          >
+            <button
+              onClick={() => setLightbox(false)}
+              style={{
+                position: 'absolute', top: 10, right: 12, background: 'none', border: 'none',
+                color: '#b8a060', fontSize: '20px', cursor: 'pointer', lineHeight: 1,
+              }}
+              aria-label="Close"
+            >✕</button>
+            <img src={gif.src} alt={gif.label} style={{ width: '100%', maxHeight: '75vh', objectFit: 'contain', borderRadius: '8px' }} />
+            <p style={{ color: '#c8b87a', fontSize: '13px', margin: '10px 0 0', textAlign: 'center' }}>{gif.caption}</p>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 function VisualAid({ questionId }) {
   const key = VISUAL_TYPE_MAP[questionId] || 'positioning';
   const v = VISUAL_LIBRARY[key];
+  if (!v) return null;
   return (
     <div className="visual-aids">
       <h4>{v.title}</h4>
       <p>{v.intro}</p>
       <div className="visual-grid">
-        {v.images.map((img, i) => (
-          <figure key={i} className="visual-card">
-            <img loading="lazy" decoding="async" src={img.src} alt={img.label} />
-            <strong>{img.label}</strong>
-            <span>{img.caption}</span>
-          </figure>
+        {v.gifs.map((gif, i) => (
+          <GifCard key={i} gif={gif} />
         ))}
       </div>
       <div className="mini-chart">
@@ -645,7 +829,7 @@ export default function BayviewGuide() {
   const emailjsReady = useRef(false);
   const saveTimer = useRef(null);
 
-  // ── Persist ──────────────────────────────────────────────────────────────
+  // ── Persist to localStorage with debounce + timestamp ───────────────────
   useEffect(() => {
     clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
@@ -654,9 +838,26 @@ export default function BayviewGuide() {
         Object.assign(s, answers);
         Object.keys(checked).forEach(id => { if (checked[id]) s[id] = true; });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+        localStorage.setItem(STORAGE_KEY + '_meta', JSON.stringify({ savedAt: new Date().toISOString() }));
       } catch { /* quota */ }
     }, 400);
   }, [answers, checked]);
+
+  // ── Restore toast on mount ───────────────────────────────────────────────
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const meta = localStorage.getItem(STORAGE_KEY + '_meta');
+      const savedAt = meta ? JSON.parse(meta).savedAt : null;
+      const label = savedAt
+        ? `Restored from ${new Date(savedAt).toLocaleString('en-AU', { weekday: 'short', hour: '2-digit', minute: '2-digit' })}`
+        : 'Previous answers restored.';
+      setTimeout(() => setToast(label), 300);
+      setTimeout(() => setToast(''), 4200);
+    } catch { /* ok */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Load EmailJS ─────────────────────────────────────────────────────────
   useEffect(() => {
@@ -833,6 +1034,8 @@ export default function BayviewGuide() {
     { href: '#projects', label: 'Projects' },
     { href: '#proof', label: 'Trust proof' },
     { href: '#domain', label: 'Domain' },
+    { href: '#content', label: 'Content assets' },
+    { href: '#timeline', label: 'Timeline & budget' },
     { href: '#decision', label: 'Build decision' },
     { href: '#resources', label: 'References' },
   ];
@@ -1051,11 +1254,19 @@ export default function BayviewGuide() {
       </main>
 
       {/* Sticky action bar */}
-      <div className="guide-action-bar guide-has-action">
-        <div className="guide-action-status">{submitStatus}</div>
-        <button type="button" onClick={resetProgress}>Clear answers</button>
-        <button type="button" onClick={() => window.print()}>Print / Save PDF</button>
-        <button type="button" className="submit-action" onClick={() => setModalOpen(true)}>Submit answers</button>
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
+        display: 'flex', alignItems: 'center', gap: '10px',
+        padding: '12px 24px',
+        borderTop: '1.5px solid #c9b98a',
+        background: 'rgba(247,242,232,0.97)',
+        backdropFilter: 'blur(14px)',
+        boxShadow: '0 -6px 28px rgba(24,32,43,0.14)',
+      }}>
+        <div style={{ marginRight: 'auto', color: '#5f6570', fontSize: '13px' }}>{submitStatus}</div>
+        <button type="button" onClick={resetProgress} style={BTN}>Clear answers</button>
+        <button type="button" onClick={() => window.print()} style={BTN}>Print / Save PDF</button>
+        <button type="button" onClick={() => setModalOpen(true)} style={BTN_PRIMARY}>Submit answers</button>
       </div>
 
       {/* Submit modal */}
@@ -1116,6 +1327,9 @@ export default function BayviewGuide() {
           color: #3a4a7a;
         }
         .answer-hint strong { display: block; margin-bottom: 2px; }
+        .visual-card:hover .gif-expand-hint { opacity: 1 !important; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
       `}</style>
     </>
   );

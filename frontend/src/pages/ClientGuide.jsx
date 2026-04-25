@@ -1,6 +1,27 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import '../index.css';
 
+// ── Action bar button styles (inline — immune to CSS specificity/caching) ─────
+const BTN = {
+  minHeight: '38px',
+  padding: '8px 18px',
+  border: '1.5px solid #b8a98a',
+  borderRadius: '8px',
+  background: '#ede8de',
+  color: '#18202b',
+  fontSize: '13px',
+  fontWeight: 600,
+  whiteSpace: 'nowrap',
+  cursor: 'pointer',
+  fontFamily: 'inherit',
+};
+const BTN_PRIMARY = {
+  ...BTN,
+  background: '#f1d491',
+  border: '1.5px solid #c9a84c',
+  fontWeight: 700,
+};
+
 // ── Config ────────────────────────────────────────────────────────────────────
 const GUIDE_CONFIG = {
   guideId: 'general',
@@ -418,7 +439,7 @@ export default function ClientGuide() {
   const emailjsReady = useRef(false);
   const saveTimer = useRef(null);
 
-  // ── Persist to localStorage with debounce ────────────────────────────────
+  // ── Persist to localStorage with debounce + timestamp ───────────────────
   useEffect(() => {
     clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
@@ -427,9 +448,26 @@ export default function ClientGuide() {
         Object.assign(s, answers);
         Object.keys(checked).forEach(id => { if (checked[id]) s[id] = true; });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+        localStorage.setItem(STORAGE_KEY + '_meta', JSON.stringify({ savedAt: new Date().toISOString() }));
       } catch { /* quota */ }
     }, 400);
   }, [answers, checked]);
+
+  // ── Restore toast on mount ───────────────────────────────────────────────
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const meta = localStorage.getItem(STORAGE_KEY + '_meta');
+      const savedAt = meta ? JSON.parse(meta).savedAt : null;
+      const label = savedAt
+        ? `Restored from ${new Date(savedAt).toLocaleString('en-AU', { weekday: 'short', hour: '2-digit', minute: '2-digit' })}`
+        : 'Previous answers restored.';
+      setTimeout(() => setToast(label), 300);
+      setTimeout(() => setToast(''), 4200);
+    } catch { /* ok */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Load EmailJS ─────────────────────────────────────────────────────────
   useEffect(() => {
@@ -784,11 +822,19 @@ export default function ClientGuide() {
       </main>
 
       {/* Sticky action bar */}
-      <div className="guide-action-bar guide-has-action">
-        <div className="guide-action-status">{submitStatus}</div>
-        <button type="button" onClick={resetProgress}>Clear answers</button>
-        <button type="button" onClick={() => window.print()}>Print / Save PDF</button>
-        <button type="button" className="submit-action" onClick={openSubmitModal}>Submit answers</button>
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
+        display: 'flex', alignItems: 'center', gap: '10px',
+        padding: '12px 24px',
+        borderTop: '1.5px solid #c9b98a',
+        background: 'rgba(247,242,232,0.97)',
+        backdropFilter: 'blur(14px)',
+        boxShadow: '0 -6px 28px rgba(24,32,43,0.14)',
+      }}>
+        <div style={{ marginRight: 'auto', color: '#5f6570', fontSize: '13px' }}>{submitStatus}</div>
+        <button type="button" onClick={resetProgress} style={BTN}>Clear answers</button>
+        <button type="button" onClick={() => window.print()} style={BTN}>Print / Save PDF</button>
+        <button type="button" onClick={openSubmitModal} style={BTN_PRIMARY}>Submit answers</button>
       </div>
 
       {/* Submit modal */}
