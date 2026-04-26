@@ -29,3 +29,10 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+#folders
+legacy_files
+_trash
+.claude
+.code-review-graph
+

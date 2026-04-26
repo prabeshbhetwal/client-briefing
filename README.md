@@ -14,14 +14,11 @@ A client-facing website briefing tool for freelance web developers. Clients fill
 
 ## Files
 
-| File | Purpose |
-|------|---------|
-| `index.html` | Full form UI and all styling |
-| `brief.js` | Form logic, save/load, submission, EmailJS integration |
-| `client-question-guide.html` | Client-facing website planning question guide |
-| `bayview-question-guide.html` | Client-facing Bayview Corp website planning guide |
-| `question-guides.css` | Shared styling for the two question guide pages |
-| `question-guides.js` | Shared guide interactions, progress tracking, answer fields, and submission |
+| File                         | Purpose                                                |
+| ---------------------------- | ------------------------------------------------------ |
+| `index.html`                 | Full form UI and all styling                           |
+| `brief.js`                   | Form logic, save/load, submission, EmailJS integration |
+| `client-question-guide.html` | Client-facing website planning question guide          |
 
 ## Setup
 
@@ -31,7 +28,11 @@ A client-facing website briefing tool for freelance web developers. Clients fill
 2. Create a new form and copy your form ID
 3. In `index.html`, find the `<form>` tag and update the `action` attribute:
    ```html
-   <form id="briefForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+   <form
+     id="briefForm"
+     action="https://formspree.io/f/YOUR_FORM_ID"
+     method="POST"
+   ></form>
    ```
 
 ### 2. EmailJS (client email copy)
@@ -46,7 +47,11 @@ A client-facing website briefing tool for freelance web developers. Clients fill
    - `{{subject}}` — email subject line
 4. In the template's HTML editor, use a `<pre>` tag for `{{brief_text}}` to preserve formatting:
    ```html
-   <pre style="font-family:monospace;font-size:13px;white-space:pre-wrap;line-height:1.7;background:#f9f9f9;padding:16px;border-radius:4px;">{{brief_text}}</pre>
+   <pre
+     style="font-family:monospace;font-size:13px;white-space:pre-wrap;line-height:1.7;background:#f9f9f9;padding:16px;border-radius:4px;"
+   >
+   {{brief_text}}</pre
+   >
    ```
 5. Note your **Template ID** and **Public Key** (Account → API Keys)
 6. Fill in the three values in `brief.js`:
