@@ -7,6 +7,7 @@ A client-facing website briefing tool and question guide. Clients fill out a mul
 This project has been modernized from a static HTML/JS application to a full **MERN stack** (MongoDB, Express, React, Node.js) application.
 
 The workspace is divided into two main directories:
+
 - **`frontend/`**: A React application built with Vite and React Router.
 - **`backend/`**: An Express server connected to a MongoDB database to store client submissions.
 
@@ -26,6 +27,7 @@ The workspace is divided into two main directories:
 ## Setup & Local Development
 
 ### Prerequisites
+
 - Node.js (v18+)
 - npm
 - MongoDB (Local instance or MongoDB Atlas URI)
@@ -33,9 +35,10 @@ The workspace is divided into two main directories:
 ### 1. Environment Variables
 
 Create a `.env` file in the `backend/` directory:
+
 ```env
-PORT=5001
-MONGODB_URI=mongodb://localhost:27017/vincomm
+PORT=
+MONGODB_URI=mongodb://localhost:YOUR_MONGO_PORT/YOUR_DATABASE
 ```
 
 ### 2. Installation
@@ -59,6 +62,7 @@ npm run dev
 ```
 
 This will concurrently run:
+
 - Frontend Vite development server
 - Backend Express development server
 
