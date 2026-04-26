@@ -1,222 +1,1059 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import "../home.css";
 
 /* ─────────────────────────────────────────
-   VISUAL AIDS — one per question
-   Types: 'photo' | 'gif' | 'svg'
-   Photos → Unsplash (seed-locked for consistency)
-   GIFs   → Tenor/Giphy public media CDN URLs
-   SVGs   → inline markup string
+   VISUAL AIDS — inline SVG infographics
+   Each teaches a non-technical user what
+   the question means & why it matters.
 ───────────────────────────────────────── */
 const VISUALS = {
-  /* ── Section A ── */
+  /* ── Section A: Overview ── */
   A1: {
-    type: "gif",
-    src: "https://media.tenor.com/GfSX-u7VGM4AAAAC/dog-shiba.gif",
-    caption:
-      "Your business name is the first thing visitors see — make sure it is the one you are proud of.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Shop sign */}
+        <rect x="60" y="28" width="160" height="70" rx="8" fill="#1a2640" stroke="#d4a93c" strokeWidth="1.5"/>
+        <rect x="68" y="36" width="144" height="54" rx="5" fill="#0f1c30"/>
+        {/* Brand name text blocks */}
+        <rect x="80" y="47" width="60" height="8" rx="3" fill="#d4a93c"/>
+        <rect x="148" y="47" width="52" height="8" rx="3" fill="#d4a93c" opacity="0.6"/>
+        <rect x="80" y="62" width="120" height="5" rx="2.5" fill="#4a6fa5" opacity="0.7"/>
+        <rect x="80" y="73" width="90" height="5" rx="2.5" fill="#4a6fa5" opacity="0.5"/>
+        {/* Sign post */}
+        <rect x="135" y="98" width="10" height="22" rx="2" fill="#1a2640"/>
+        <rect x="105" y="118" width="70" height="6" rx="3" fill="#1a2640"/>
+        {/* Label */}
+        <text x="140" y="147" fill="#8a9ab5" fontSize="9" textAnchor="middle" fontFamily="sans-serif">Your name = your first impression online</text>
+      </svg>
+    ),
+    caption: "Your business name is the foundation — everything on the site starts here.",
   },
+
   A2: {
-    type: "gif",
-    src: "https://media.tenor.com/kSTCkCGlRdUAAAAC/talking-explain.gif",
-    caption:
-      "Think of this like explaining your business to a friend at dinner — plain English, no jargon.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Person silhouette */}
+        <circle cx="70" cy="58" r="18" fill="#1a3050"/>
+        <circle cx="70" cy="52" r="9" fill="#4a6fa5"/>
+        <path d="M52 75 Q70 68 88 75 L90 95 Q70 100 50 95Z" fill="#4a6fa5"/>
+        {/* Speech bubble */}
+        <rect x="100" y="30" width="150" height="72" rx="10" fill="#1a2640" stroke="#d4a93c" strokeWidth="1.2"/>
+        <polygon points="100,62 88,68 100,74" fill="#1a2640"/>
+        {/* Text lines inside bubble */}
+        <rect x="112" y="44" width="126" height="6" rx="3" fill="#d4a93c" opacity="0.8"/>
+        <rect x="112" y="57" width="110" height="5" rx="2.5" fill="#8a9ab5" opacity="0.7"/>
+        <rect x="112" y="68" width="120" height="5" rx="2.5" fill="#8a9ab5" opacity="0.6"/>
+        <rect x="112" y="79" width="80" height="5" rx="2.5" fill="#8a9ab5" opacity="0.5"/>
+        {/* Footer label */}
+        <text x="140" y="120" fill="#d4a93c" fontSize="8.5" textAnchor="middle" fontFamily="sans-serif" fontStyle="italic">"We help small businesses get found online"</text>
+        <text x="140" y="135" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Simple plain-English pitch = best website copy</text>
+        <text x="140" y="148" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Write it exactly how you'd say it to a friend</text>
+      </svg>
+    ),
+    caption: "Imagine explaining your business to a friend over coffee. Write exactly that.",
   },
+
   A3: {
-    type: "gif",
-    src: "https://media.tenor.com/arTqBBQz17kAAAAC/focus-target.gif",
-    caption:
-      "Your website has one job right now. Everything else is secondary.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Bullseye */}
+        <circle cx="100" cy="78" r="48" fill="#1a2640"/>
+        <circle cx="100" cy="78" r="36" fill="#0f1c30"/>
+        <circle cx="100" cy="78" r="24" fill="#1a3050"/>
+        <circle cx="100" cy="78" r="12" fill="#c0392b" opacity="0.85"/>
+        <circle cx="100" cy="78" r="5" fill="#e74c3c"/>
+        {/* Arrow */}
+        <line x1="160" y1="30" x2="110" y2="74" stroke="#d4a93c" strokeWidth="2.5" strokeLinecap="round"/>
+        <polygon points="108,68 116,68 110,78" fill="#d4a93c"/>
+        {/* Goal labels on right */}
+        <rect x="170" y="34" width="90" height="14" rx="4" fill="#1a2640"/>
+        <circle cx="178" cy="41" r="3" fill="#e74c3c"/>
+        <rect x="185" y="38" width="68" height="6" rx="3" fill="#d4a93c" opacity="0.9"/>
+        <rect x="170" y="54" width="90" height="14" rx="4" fill="#1a2640" opacity="0.6"/>
+        <circle cx="178" cy="61" r="3" fill="#4a6fa5" opacity="0.7"/>
+        <rect x="185" y="58" width="52" height="5" rx="2.5" fill="#8a9ab5" opacity="0.5"/>
+        <rect x="170" y="74" width="90" height="14" rx="4" fill="#1a2640" opacity="0.5"/>
+        <circle cx="178" cy="81" r="3" fill="#4a6fa5" opacity="0.5"/>
+        <rect x="185" y="78" width="44" height="5" rx="2.5" fill="#8a9ab5" opacity="0.4"/>
+        <text x="215" y="112" fill="#d4a93c" fontSize="8.5" textAnchor="middle" fontFamily="sans-serif">Priority #1</text>
+        <text x="140" y="135" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">One clear goal = a website that actually converts</text>
+        <text x="140" y="148" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">e.g. Get enquiries · Sell products · Build credibility</text>
+      </svg>
+    ),
+    caption: "One job. What is the single most important thing this website should do for you?",
   },
+
   A4: {
-    type: "gif",
-    src: "https://media.tenor.com/vX6cFDCvx3IAAAAC/web-design-website.gif",
-    caption:
-      "A reference website gives us instant visual shorthand — no lengthy descriptions needed.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Browser window */}
+        <rect x="20" y="18" width="240" height="120" rx="7" fill="#1a2640" stroke="#2a3a55" strokeWidth="1"/>
+        {/* Browser bar */}
+        <rect x="20" y="18" width="240" height="24" rx="7" fill="#0f1c30"/>
+        <rect x="20" y="30" width="240" height="12" fill="#0f1c30"/>
+        {/* Traffic lights */}
+        <circle cx="36" cy="30" r="4" fill="#e74c3c" opacity="0.8"/>
+        <circle cx="50" cy="30" r="4" fill="#f39c12" opacity="0.8"/>
+        <circle cx="64" cy="30" r="4" fill="#2ecc71" opacity="0.8"/>
+        {/* URL bar */}
+        <rect x="80" y="24" width="152" height="12" rx="5" fill="#1a3050"/>
+        <text x="156" y="33" fill="#4a6fa5" fontSize="8" textAnchor="middle" fontFamily="monospace">www.example-site.com.au</text>
+        {/* Page content wireframe */}
+        <rect x="30" y="52" width="220" height="36" rx="4" fill="#0f1c30"/>
+        <rect x="40" y="60" width="100" height="8" rx="3" fill="#d4a93c" opacity="0.7"/>
+        <rect x="40" y="72" width="150" height="5" rx="2.5" fill="#4a6fa5" opacity="0.5"/>
+        <rect x="30" y="96" width="100" height="32" rx="4" fill="#1a3050" opacity="0.7"/>
+        <rect x="138" y="96" width="112" height="32" rx="4" fill="#1a3050" opacity="0.5"/>
+        {/* Pointer / bookmark */}
+        <path d="M248 20 L256 20 L256 36 L252 32 L248 36Z" fill="#d4a93c" opacity="0.8"/>
+        <text x="140" y="148" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Share a site you love → we match its style for you</text>
+      </svg>
+    ),
+    caption: "Point us to a site you like — it gives us instant visual shorthand.",
   },
 
-  /* ── Section B ── */
+  /* ── Section B: Audience ── */
   B1: {
-    type: "gif",
-    src: "https://media.tenor.com/GKBdXODkZ0QAAAAC/crowd-people.gif",
-    caption:
-      "Your website speaks to different groups — but not all of them equally.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Three audience cards */}
+        {[0,1,2].map(i => {
+          const x = 24 + i * 84;
+          const colors = ["#3a7bd5","#d4a93c","#2ecc71"];
+          const labels = ["Investor","Local Buyer","Corporate"];
+          const sub = ["Wants credibility","Needs pricing","Seeks portfolio"];
+          return (
+            <g key={i}>
+              <rect x={x} y="22" width="72" height="96" rx="7" fill="#1a2640" stroke={colors[i]} strokeWidth="1.2"/>
+              <circle cx={x+36} cy="46" r="14" fill={colors[i]} opacity="0.25"/>
+              <circle cx={x+36} cy="40" r="7" fill={colors[i]} opacity="0.7"/>
+              <path d={`M${x+18} 58 Q${x+36} 52 ${x+54} 58 L${x+56} 74 Q${x+36} 78 ${x+16} 74Z`} fill={colors[i]} opacity="0.5"/>
+              <text x={x+36} y="92" fill={colors[i]} fontSize="8.5" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">{labels[i]}</text>
+              <text x={x+36} y="104" fill="#8a9ab5" fontSize="7" textAnchor="middle" fontFamily="sans-serif">{sub[i]}</text>
+            </g>
+          );
+        })}
+        <text x="140" y="135" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Different people visit for different reasons.</text>
+        <text x="140" y="148" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Name them so we design for each one.</text>
+      </svg>
+    ),
+    caption: "Who exactly visits your site? Not everyone — be specific about your audience.",
   },
+
   B2: {
-    type: "gif",
-    src: "https://media.tenor.com/pOgWkdmk-CMAAAAC/target-focus.gif",
-    caption: "One primary audience. Design everything around them first.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Three cards, middle spotlit */}
+        {[0,1,2].map(i => {
+          const x = 24 + i * 84;
+          const isMain = i === 1;
+          const col = isMain ? "#d4a93c" : "#2a3a55";
+          const textCol = isMain ? "#d4a93c" : "#4a6fa5";
+          return (
+            <g key={i}>
+              <rect x={x} y={isMain ? 14 : 28} width="72" height={isMain ? 100 : 80} rx="7"
+                fill={isMain ? "#1e2d45" : "#141e2e"} stroke={col} strokeWidth={isMain ? 2 : 1}
+                opacity={isMain ? 1 : 0.5}/>
+              <circle cx={x+36} cy={isMain ? 38 : 48} r={isMain ? 16 : 11} fill={col} opacity={isMain ? 0.3 : 0.15}/>
+              <circle cx={x+36} cy={isMain ? 32 : 43} r={isMain ? 9 : 6} fill={col} opacity={isMain ? 0.8 : 0.35}/>
+              {isMain && <path d="M156 52 Q176 46 196 52 L198 74 Q176 78 154 74Z" fill="#d4a93c" opacity="0.5"/>}
+              {isMain && <text x="176" y="88" fill="#d4a93c" fontSize="9" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">PRIMARY</text>}
+              {isMain && <text x="176" y="100" fill="#8a9ab5" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">Design for this person first</text>}
+            </g>
+          );
+        })}
+        {/* spotlight rays */}
+        <line x1="176" y1="14" x2="150" y2="0" stroke="#d4a93c" strokeWidth="1" opacity="0.3"/>
+        <line x1="176" y1="14" x2="176" y2="0" stroke="#d4a93c" strokeWidth="1" opacity="0.3"/>
+        <line x1="176" y1="14" x2="202" y2="0" stroke="#d4a93c" strokeWidth="1" opacity="0.3"/>
+        {/* Audience labels below cards */}
+        <text x="60" y="120" fill="#2a3a55" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">Secondary</text>
+        <text x="176" y="122" fill="#d4a93c" fontSize="8" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">★ Primary</text>
+        <text x="228" y="120" fill="#2a3a55" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">Secondary</text>
+        <line x1="30" y1="127" x2="250" y2="127" stroke="#1a2640" strokeWidth="1"/>
+        <text x="140" y="140" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">One audience drives the most value.</text>
+        <text x="140" y="153" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Every design choice serves them first.</text>
+      </svg>
+    ),
+    caption: "Pick your primary audience. Design everything around that one person first.",
   },
+
   B3: {
-    type: "gif",
-    src: "https://media.tenor.com/6Xl8mKu6fBYAAAAC/thinking-person.gif",
-    caption:
-      "What question does your visitor arrive with? Answer it before they even ask.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Person arriving */}
+        <circle cx="52" cy="68" r="16" fill="#1a3050"/>
+        <circle cx="52" cy="62" r="8" fill="#4a6fa5"/>
+        <path d="M36 80 Q52 74 68 80 L70 98 Q52 103 34 98Z" fill="#4a6fa5"/>
+        {/* Arrow pointing right */}
+        <line x1="76" y1="74" x2="100" y2="74" stroke="#d4a93c" strokeWidth="2" strokeDasharray="4 3"/>
+        <polygon points="98,70 106,74 98,78" fill="#d4a93c"/>
+        {/* Browser screen */}
+        <rect x="108" y="40" width="140" height="88" rx="6" fill="#1a2640" stroke="#2a3a55" strokeWidth="1"/>
+        <rect x="108" y="40" width="140" height="18" rx="6" fill="#0f1c30"/>
+        <rect x="108" y="50" width="140" height="8" fill="#0f1c30"/>
+        <circle cx="120" cy="49" r="3" fill="#e74c3c" opacity="0.7"/>
+        <circle cx="131" cy="49" r="3" fill="#f39c12" opacity="0.7"/>
+        <rect x="116" y="66" width="120" height="7" rx="3" fill="#d4a93c" opacity="0.75"/>
+        <rect x="116" y="79" width="100" height="5" rx="2.5" fill="#4a6fa5" opacity="0.5"/>
+        <rect x="116" y="90" width="80" height="5" rx="2.5" fill="#4a6fa5" opacity="0.4"/>
+        {/* Question bubble */}
+        <rect x="30" y="20" width="116" height="30" rx="8" fill="#1e2d45" stroke="#d4a93c" strokeWidth="1.2"/>
+        <polygon points="52,50 46,56 58,56" fill="#1e2d45"/>
+        <text x="88" y="32" fill="#d4a93c" fontSize="8.5" textAnchor="middle" fontFamily="sans-serif">"Can they do what I need?"</text>
+        <text x="88" y="44" fill="#8a9ab5" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">Their first unspoken question</text>
+        <text x="140" y="140" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Answer their question in the first 5 seconds</text>
+        <text x="140" y="152" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">or they leave and never come back.</text>
+      </svg>
+    ),
+    caption: "Your visitor arrives with a question. What is it? Answer it before they ask.",
   },
+
   B4: {
-    type: "gif",
-    src: "https://media.tenor.com/SooOa3fpYbsAAAAC/success-win.gif",
-    caption:
-      'A "good visit" ends with action — a call, a bookmark, a referral.',
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Journey steps */}
+        {[
+          { x: 20, label: "Arrives", icon: "👁", col: "#4a6fa5" },
+          { x: 85, label: "Reads / Watches", icon: "📖", col: "#8e44ad" },
+          { x: 150, label: "Decides", icon: "💡", col: "#d4a93c" },
+          { x: 215, label: "Acts", icon: "✅", col: "#2ecc71" },
+        ].map((step, i) => (
+          <g key={i}>
+            <circle cx={step.x + 25} cy="65" r="22" fill="#1a2640" stroke={step.col} strokeWidth="1.5"/>
+            <text x={step.x + 25} y="70" textAnchor="middle" fontSize="14" fontFamily="sans-serif">{step.icon}</text>
+            <text x={step.x + 25} y="102" fill={step.col} fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">{step.label}</text>
+          </g>
+        ))}
+        {/* Arrows between steps */}
+        {[0,1,2].map(i => (
+          <g key={i}>
+            <line x1={65 + i*65} y1="65" x2={80 + i*65} y2="65" stroke="#2a3a55" strokeWidth="1.5" strokeDasharray="3 2"/>
+            <polygon points={`${78+i*65},61 ${86+i*65},65 ${78+i*65},69`} fill="#2a3a55"/>
+          </g>
+        ))}
+        {/* CTA box at bottom */}
+        <rect x="190" y="110" width="70" height="22" rx="6" fill="#2ecc71" opacity="0.9"/>
+        <text x="225" y="125" fill="#0d1521" fontSize="9" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">Book a Call →</text>
+        <text x="140" y="148" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Define the desired action → we engineer the page around it.</text>
+      </svg>
+    ),
+    caption: "A successful visit ends with action — a call made, a form submitted, a decision reached.",
   },
 
-  /* ── Section C ── */
+  /* ── Section C: Goals ── */
   C1: {
-    type: "gif",
-    src: "https://media.tenor.com/OYQ6TSQk1h4AAAAC/goal-score.gif",
-    caption:
-      "Success looks different for every business. Define yours before we build anything.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Chart axes */}
+        <line x1="35" y1="110" x2="245" y2="110" stroke="#2a3a55" strokeWidth="1.5"/>
+        <line x1="35" y1="20" x2="35" y2="110" stroke="#2a3a55" strokeWidth="1.5"/>
+        {/* Growth line */}
+        <polyline points="35,108 75,95 115,82 155,60 195,38 235,20" fill="none" stroke="#d4a93c" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        {/* Milestone flag — anchored to x=195,y=38 on the growth line */}
+        <line x1="195" y1="18" x2="195" y2="38" stroke="#2ecc71" strokeWidth="1.5"/>
+        <rect x="148" y="18" width="56" height="15" rx="3" fill="#2ecc71" opacity="0.85"/>
+        <text x="176" y="29" fill="#0d1521" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">Goal reached ✓</text>
+        {/* X axis labels */}
+        <text x="35" y="122" fill="#4a6fa5" fontSize="7" textAnchor="middle" fontFamily="sans-serif">Now</text>
+        <text x="235" y="122" fill="#4a6fa5" fontSize="7" textAnchor="middle" fontFamily="sans-serif">6 mo</text>
+        {/* Y label */}
+        <text x="28" y="65" fill="#4a6fa5" fontSize="7" textAnchor="middle" fontFamily="sans-serif" transform="rotate(-90,28,65)">Results</text>
+        {/* Metric chips */}
+        <rect x="50" y="130" width="52" height="14" rx="4" fill="#1a2640"/>
+        <text x="76" y="140" fill="#4a6fa5" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">Enquiries ↑</text>
+        <rect x="112" y="130" width="56" height="14" rx="4" fill="#1a2640"/>
+        <text x="140" y="140" fill="#d4a93c" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">Revenue ↑</text>
+        <rect x="178" y="130" width="52" height="14" rx="4" fill="#1a2640"/>
+        <text x="204" y="140" fill="#2ecc71" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">Bookings ↑</text>
+        <text x="140" y="155" fill="#8a9ab5" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">Define what success looks like before we build anything.</text>
+      </svg>
+    ),
+    caption: "Define success before we build anything. What outcome tells you this was worth it?",
   },
+
   C2: {
-    type: "gif",
-    src: "https://media.tenor.com/7eDFh7OY-38AAAAC/priority-list.gif",
-    caption:
-      "Rank your goals — what matters most drives every design decision.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Goal list */}
+        {[
+          { rank: "1", label: "Get more enquiries", col: "#d4a93c", w: 160 },
+          { rank: "2", label: "Show portfolio of work", col: "#3a7bd5", w: 130 },
+          { rank: "3", label: "Build brand credibility", col: "#8e44ad", w: 100 },
+          { rank: "4", label: "Rank on Google", col: "#2ecc71", w: 75 },
+        ].map((g, i) => (
+          <g key={i}>
+            <rect x="28" y={20 + i*30} width="224" height="22" rx="5" fill="#141e2e"/>
+            {/* Rank badge */}
+            <rect x="28" y={20+i*30} width="24" height="22" rx="5" fill={g.col} opacity="0.85"/>
+            <text x="40" y={35+i*30} fill="#0d1521" fontSize="11" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">{g.rank}</text>
+            {/* Progress bar */}
+            <rect x="60" y={28+i*30} width="184" height="6" rx="3" fill="#1a2640"/>
+            <rect x="60" y={28+i*30} width={g.w} height="6" rx="3" fill={g.col} opacity="0.7"/>
+            <text x="64" y={35+i*30} fill="#e0e8f0" fontSize="8" fontFamily="sans-serif">{g.label}</text>
+          </g>
+        ))}
+        <text x="140" y="148" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Ranking reveals priorities — #1 gets the most screen space and budget.</text>
+      </svg>
+    ),
+    caption: "Ranking forces honesty. What matters most shapes every design decision.",
   },
+
   C3: {
-    type: "gif",
-    src: "https://media.tenor.com/vRfNMZJPGkEAAAAC/cta-button-click.gif",
-    caption:
-      "One clear call-to-action. Make it obvious. Make it easy. Everything else supports it.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Webpage wireframe */}
+        <rect x="20" y="14" width="240" height="118" rx="7" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        {/* Nav bar */}
+        <rect x="20" y="14" width="240" height="18" rx="7" fill="#0f1c30"/>
+        <rect x="20" y="24" width="240" height="8" fill="#0f1c30"/>
+        <rect x="28" y="18" width="30" height="8" rx="3" fill="#2a3a55"/>
+        <rect x="180" y="18" width="22" height="8" rx="3" fill="#2a3a55" opacity="0.6"/>
+        <rect x="208" y="18" width="22" height="8" rx="3" fill="#2a3a55" opacity="0.6"/>
+        {/* Hero text */}
+        <rect x="32" y="36" width="120" height="9" rx="3" fill="#4a6fa5" opacity="0.6"/>
+        <rect x="32" y="50" width="100" height="6" rx="3" fill="#2a3a55" opacity="0.5"/>
+        <rect x="32" y="61" width="90" height="6" rx="3" fill="#2a3a55" opacity="0.4"/>
+        {/* CTA BUTTON — highlighted */}
+        <rect x="32" y="76" width="110" height="28" rx="7" fill="#d4a93c"/>
+        <text x="87" y="94" fill="#0d1521" fontSize="8.5" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">Book a Free Call →</text>
+        {/* Glow behind CTA */}
+        <rect x="28" y="72" width="118" height="36" rx="9" fill="none" stroke="#d4a93c" strokeWidth="2" opacity="0.4"/>
+        {/* Arrow pointing to CTA */}
+        <line x1="220" y1="55" x2="160" y2="86" stroke="#d4a93c" strokeWidth="1.5" strokeDasharray="4 3"/>
+        <polygon points="161,80 155,90 168,88" fill="#d4a93c"/>
+        <rect x="180" y="42" width="66" height="16" rx="4" fill="#1a2640" stroke="#d4a93c" strokeWidth="1"/>
+        <text x="213" y="53" fill="#d4a93c" fontSize="8" textAnchor="middle" fontFamily="sans-serif">One main action</text>
+        <text x="140" y="148" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">One CTA, made impossible to miss = more conversions.</text>
+      </svg>
+    ),
+    caption: "One dominant call-to-action. Make it obvious. Make it impossible to miss.",
   },
 
-  /* ── Section D ── */
+  /* ── Section D: Pages ── */
   D_home: {
-    type: "gif",
-    src: "https://media.tenor.com/WS3oX3-XGpYAAAAC/website-web-design.gif",
-    caption:
-      "The home page: your digital front door. First impression. Hero shot. Clear headline.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Browser chrome */}
+        <rect x="16" y="10" width="248" height="136" rx="7" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        <rect x="16" y="10" width="248" height="18" rx="7" fill="#0f1c30"/>
+        <rect x="16" y="20" width="248" height="8" fill="#0f1c30"/>
+        <circle cx="28" cy="19" r="3.5" fill="#e74c3c" opacity="0.7"/>
+        <circle cx="40" cy="19" r="3.5" fill="#f39c12" opacity="0.7"/>
+        <circle cx="52" cy="19" r="3.5" fill="#2ecc71" opacity="0.7"/>
+        <rect x="68" y="14" width="148" height="10" rx="4" fill="#1a3050"/>
+        {/* NAV */}
+        <rect x="16" y="28" width="248" height="16" fill="#0d1521"/>
+        <rect x="24" y="31" width="28" height="8" rx="3" fill="#d4a93c" opacity="0.7"/>
+        <rect x="170" y="31" width="22" height="8" rx="3" fill="#2a3a55" opacity="0.6"/>
+        <rect x="198" y="31" width="22" height="8" rx="3" fill="#2a3a55" opacity="0.6"/>
+        <rect x="226" y="31" width="28" height="8" rx="4" fill="#d4a93c" opacity="0.85"/>
+        {/* Hero section */}
+        <rect x="16" y="44" width="248" height="52" fill="#1a2640"/>
+        <rect x="26" y="52" width="100" height="8" rx="3" fill="#e0e8f0" opacity="0.8"/>
+        <rect x="26" y="65" width="80" height="5" rx="2.5" fill="#8a9ab5" opacity="0.6"/>
+        <rect x="26" y="76" width="60" height="14" rx="5" fill="#d4a93c"/>
+        <text x="56" y="87" fill="#0d1521" fontSize="8" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">Get Started</text>
+        <rect x="150" y="48" width="106" height="44" rx="4" fill="#0f1c30" opacity="0.7"/>
+        <rect x="158" y="56" width="90" height="28" rx="3" fill="#1a3050" opacity="0.8"/>
+        {/* 3 feature blocks */}
+        {[0,1,2].map(i => (
+          <g key={i}>
+            <rect x={26+i*78} y="100" width="70" height="30" rx="4" fill="#141e2e"/>
+            <rect x={32+i*78} y="105" width="16" height="10" rx="3" fill="#3a7bd5" opacity="0.7"/>
+            <rect x={32+i*78} y="118" width="52" height="5" rx="2.5" fill="#2a3a55"/>
+          </g>
+        ))}
+        {/* Footer line */}
+        <rect x="16" y="134" width="248" height="12" rx="4" fill="#0f1c30"/>
+        <text x="140" y="142" fill="#4a6fa5" fontSize="7" textAnchor="middle" fontFamily="sans-serif">Nav · Hero · Feature blocks · Footer</text>
+      </svg>
+    ),
+    caption: "The home page is your digital front door — first impression, hero shot, clear headline.",
   },
+
   D_about: {
-    type: "gif",
-    src: "https://media.tenor.com/sRSBrohv6CMAAAAC/team-work-together.gif",
-    caption:
-      "The About page builds trust. Who you are, how long you've operated, why you exist.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Page frame */}
+        <rect x="16" y="12" width="248" height="132" rx="7" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        {/* Header bar */}
+        <rect x="16" y="12" width="248" height="18" rx="7" fill="#0f1c30"/>
+        <rect x="16" y="22" width="248" height="8" fill="#0f1c30"/>
+        <rect x="24" y="16" width="40" height="8" rx="3" fill="#2a3a55"/>
+        {/* "About" heading */}
+        <rect x="26" y="36" width="60" height="9" rx="3" fill="#d4a93c" opacity="0.8"/>
+        {/* Team photo area */}
+        <rect x="26" y="50" width="100" height="60" rx="5" fill="#1a3050"/>
+        {/* People silhouettes in photo */}
+        {[0,1,2].map(i => (
+          <g key={i}>
+            <circle cx={46+i*28} cy="68" r="8" fill="#4a6fa5" opacity={0.5+i*0.15}/>
+            <path d={`M${34+i*28} 78 Q${46+i*28} 73 ${58+i*28} 78 L${60+i*28} 100 Q${46+i*28} 104 ${32+i*28} 100Z`}
+              fill="#4a6fa5" opacity={0.4+i*0.1}/>
+          </g>
+        ))}
+        <rect x="26" y="112" width="100" height="6" rx="3" fill="#2a3a55" opacity="0.5"/>
+        {/* Story / bio text */}
+        <rect x="136" y="50" width="118" height="7" rx="3" fill="#e0e8f0" opacity="0.5"/>
+        <rect x="136" y="63" width="108" height="5" rx="2.5" fill="#2a3a55" opacity="0.5"/>
+        <rect x="136" y="73" width="114" height="5" rx="2.5" fill="#2a3a55" opacity="0.4"/>
+        <rect x="136" y="83" width="100" height="5" rx="2.5" fill="#2a3a55" opacity="0.4"/>
+        <rect x="136" y="93" width="88" height="5" rx="2.5" fill="#2a3a55" opacity="0.3"/>
+        <rect x="136" y="106" width="60" height="14" rx="5" fill="#3a7bd5" opacity="0.8"/>
+        <text x="166" y="117" fill="#e0e8f0" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Our Story →</text>
+        <text x="140" y="152" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Team photo + company story = trust before the first call.</text>
+      </svg>
+    ),
+    caption: "The About page builds trust. Who you are, why you exist, why clients should choose you.",
   },
+
   D_projects: {
-    type: "gif",
-    src: "https://media.tenor.com/xk85M3MwzMEAAAAC/portfolio-design.gif",
-    caption:
-      "A portfolio / projects page lets your work speak for itself. Show, don't tell.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Page header */}
+        <rect x="16" y="12" width="248" height="16" rx="6" fill="#0f1c30"/>
+        <rect x="24" y="16" width="40" height="8" rx="3" fill="#2a3a55"/>
+        {/* Portfolio grid — 2×2 */}
+        {[0,1,2,3].map(i => {
+          const col = i % 2;
+          const row = Math.floor(i / 2);
+          const x = 16 + col * 128;
+          const y = 32 + row * 60;
+          const colors = ["#3a7bd5","#d4a93c","#2ecc71","#8e44ad"];
+          return (
+            <g key={i}>
+              <rect x={x+4} y={y+2} width="116" height="52" rx="5" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+              <rect x={x+4} y={y+2} width="116" height="30" rx="5" fill={colors[i]} opacity="0.2"/>
+              <rect x={x+12} y={y+10} width="60" height="5" rx="2" fill={colors[i]} opacity="0.5"/>
+              <rect x={x+12} y={y+18} width="80" height="3" rx="1.5" fill="#2a3a55"/>
+              <rect x={x+12} y={y+36} width="90" height="5" rx="2.5" fill="#2a3a55" opacity="0.6"/>
+              <rect x={x+12} y={y+44} width="70" height="5" rx="2.5" fill="#2a3a55" opacity="0.4"/>
+            </g>
+          );
+        })}
+        <text x="140" y="152" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">A portfolio grid shows your best work — results speak louder than words.</text>
+      </svg>
+    ),
+    caption: "Show your best work. A portfolio page lets results speak louder than words.",
   },
+
   D_contact: {
-    type: "gif",
-    src: "https://media.tenor.com/bGhbV3-A4VIAAAAC/contact-us-email.gif",
-    caption:
-      "The contact page is where intent becomes action. Make it effortless.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Contact icons row */}
+        {[
+          { icon: "📞", label: "Phone", col: "#2ecc71", x: 42 },
+          { icon: "✉️", label: "Email", col: "#3a7bd5", x: 140 },
+          { icon: "📝", label: "Form", col: "#d4a93c", x: 238 },
+        ].map(c => (
+          <g key={c.x}>
+            <circle cx={c.x} cy="50" r="24" fill="#1a2640" stroke={c.col} strokeWidth="1.5"/>
+            <text x={c.x} y="57" textAnchor="middle" fontSize="18" fontFamily="sans-serif">{c.icon}</text>
+            <text x={c.x} y="87" fill={c.col} fontSize="9" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">{c.label}</text>
+          </g>
+        ))}
+        {/* Form wireframe */}
+        <rect x="30" y="96" width="220" height="48" rx="6" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        <rect x="40" y="104" width="90" height="10" rx="3" fill="#1a3050"/>
+        <rect x="140" y="104" width="100" height="10" rx="3" fill="#1a3050"/>
+        <rect x="40" y="120" width="200" height="10" rx="3" fill="#1a3050"/>
+        <rect x="160" y="134" width="80" height="14" rx="5" fill="#d4a93c"/>
+        <text x="200" y="145" fill="#0d1521" fontSize="8.5" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">Send Enquiry →</text>
+        <text x="140" y="156" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">The contact page converts interest into action.</text>
+      </svg>
+    ),
+    caption: "The contact page converts interest into action. Make it effortless to reach you.",
   },
+
   D_other: {
-    type: "gif",
-    src: "https://media.tenor.com/FBBqoOiwfvIAAAAC/building-blocks-blocks.gif",
-    caption:
-      "Think in building blocks. Start with what you need now, add more as you grow.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Three modular page blocks */}
+        {[
+          { label: "Services", icon: "⚙️", col: "#3a7bd5", x: 18 },
+          { label: "FAQ", icon: "❓", col: "#d4a93c", x: 106 },
+          { label: "Blog", icon: "📰", col: "#2ecc71", x: 194 },
+        ].map(b => (
+          <g key={b.x}>
+            <rect x={b.x} y="16" width="76" height="104" rx="7" fill="#141e2e" stroke={b.col} strokeWidth="1.2"/>
+            <rect x={b.x} y="16" width="76" height="24" rx="7" fill={b.col} opacity="0.2"/>
+            <rect x={b.x} y="32" width="76" height="8" fill={b.col} opacity="0.1"/>
+            <text x={b.x+38} y="32" textAnchor="middle" fontSize="14" fontFamily="sans-serif">{b.icon}</text>
+            <text x={b.x+38} y="52" fill={b.col} fontSize="9" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">{b.label}</text>
+            <rect x={b.x+8} y="60" width="60" height="5" rx="2.5" fill="#2a3a55" opacity="0.6"/>
+            <rect x={b.x+8} y="70" width="52" height="5" rx="2.5" fill="#2a3a55" opacity="0.5"/>
+            <rect x={b.x+8} y="80" width="46" height="5" rx="2.5" fill="#2a3a55" opacity="0.4"/>
+            <rect x={b.x+8} y="96" width="60" height="14" rx="4" fill={b.col} opacity="0.7"/>
+            <text x={b.x+38} y="107" fill="#0d1521" fontSize="8" textAnchor="middle" fontFamily="sans-serif">View →</text>
+          </g>
+        ))}
+        <text x="140" y="135" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Extra pages let you go deeper on any topic.</text>
+        <text x="140" y="148" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Tell us what you need — we'll build it in.</text>
+      </svg>
+    ),
+    caption: "Extra pages for specific needs — services, FAQs, testimonials, or anything else.",
   },
 
-  /* ── Section E ── */
+  /* ── Section E: Future Plans ── */
   E1: {
-    type: "gif",
-    src: "https://media.tenor.com/bHPFGKFBgpEAAAAC/rocket-launch.gif",
-    caption:
-      "These are seeds, not commitments. Plant them now so the foundation supports them later.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Title */}
+        <text x="140" y="22" fill="#d4a93c" fontSize="9" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold" opacity="0.8">Website Roadmap</text>
+        {/* Timeline line */}
+        <line x1="30" y1="60" x2="250" y2="60" stroke="#2a3a55" strokeWidth="2"/>
+        {/* Phase 1 — Launch */}
+        <circle cx="70" cy="60" r="14" fill="#d4a93c" opacity="0.9"/>
+        <text x="70" y="65" fill="#0d1521" fontSize="9" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">v1</text>
+        <rect x="28" y="80" width="84" height="52" rx="5" fill="#1a2640" stroke="#d4a93c" strokeWidth="1.5"/>
+        <text x="70" y="96" fill="#d4a93c" fontSize="9" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">Launch</text>
+        <rect x="36" y="103" width="68" height="5" rx="2.5" fill="#2a3a55"/>
+        <rect x="36" y="113" width="56" height="5" rx="2.5" fill="#2a3a55" opacity="0.7"/>
+        <rect x="36" y="123" width="44" height="5" rx="2.5" fill="#2a3a55" opacity="0.5"/>
+        {/* Phase 2 & 3 nodes */}
+        {[150, 210].map((cx, i) => (
+          <g key={i}>
+            <circle cx={cx} cy="60" r="12" fill="#1a3050" stroke="#4a6fa5" strokeWidth="1.5" strokeDasharray="3 2"/>
+            <text x={cx} y="65" fill="#4a6fa5" fontSize="9" textAnchor="middle" fontFamily="sans-serif">v{i+2}</text>
+            <rect x={cx-40} y="80" width="80" height="52" rx="5" fill="#141e2e" stroke="#2a3a55" strokeWidth="1" opacity="0.7"/>
+            <text x={cx} y="96" fill="#4a6fa5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Future</text>
+            <rect x={cx-34} y="103" width="68" height="5" rx="2.5" fill="#1a2640" opacity="0.6"/>
+            <rect x={cx-34} y="113" width="50" height="5" rx="2.5" fill="#1a2640" opacity="0.4"/>
+            <rect x={cx-34} y="123" width="38" height="5" rx="2.5" fill="#1a2640" opacity="0.3"/>
+          </g>
+        ))}
+        <text x="140" y="150" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Plan now → build in phases → no expensive rebuilds later.</text>
+      </svg>
+    ),
+    caption: "Tick what might be useful later — no commitment, just planting seeds for the future.",
   },
+
   E2: {
-    type: "gif",
-    src: "https://media.tenor.com/qLRCTKPqJT4AAAAC/inspiration-ideas.gif",
-    caption:
-      "Inspiration is everywhere. Screenshot it, bookmark it, paste the link here.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Browser with bookmark bar */}
+        <rect x="16" y="14" width="248" height="118" rx="7" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        <rect x="16" y="14" width="248" height="20" rx="7" fill="#0f1c30"/>
+        <rect x="16" y="26" width="248" height="8" fill="#0f1c30"/>
+        <circle cx="28" cy="24" r="3" fill="#e74c3c" opacity="0.7"/>
+        <circle cx="40" cy="24" r="3" fill="#f39c12" opacity="0.7"/>
+        <circle cx="52" cy="24" r="3" fill="#2ecc71" opacity="0.7"/>
+        <rect x="64" y="18" width="140" height="12" rx="4" fill="#1a3050"/>
+        <text x="134" y="28" fill="#4a6fa5" fontSize="8" textAnchor="middle" fontFamily="monospace">apple.com</text>
+        {/* Bookmark bar */}
+        <rect x="16" y="34" width="248" height="14" fill="#0d1521"/>
+        {["airbnb.com","stripe.com","notion.so","linear.app"].map((s,i) => (
+          <g key={i}>
+            <rect x={20+i*58} y="37" width="50" height="8" rx="3" fill="#1a2640"/>
+            <text x={45+i*58} y="44" fill="#4a6fa5" fontSize="7" textAnchor="middle" fontFamily="sans-serif">{s}</text>
+          </g>
+        ))}
+        {/* Main page content */}
+        <rect x="24" y="52" width="232" height="70" rx="5" fill="#1a2640"/>
+        <rect x="32" y="60" width="110" height="10" rx="3" fill="#d4a93c" opacity="0.6"/>
+        <rect x="32" y="76" width="160" height="6" rx="3" fill="#4a6fa5" opacity="0.4"/>
+        <rect x="32" y="87" width="140" height="6" rx="3" fill="#4a6fa5" opacity="0.3"/>
+        <rect x="32" y="100" width="90" height="14" rx="5" fill="#3a7bd5" opacity="0.8"/>
+        {/* Star / bookmark icon */}
+        <text x="240" y="65" fontSize="16" fontFamily="sans-serif" opacity="0.8">⭐</text>
+        <text x="140" y="148" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Share any site you've bookmarked — we extract the style you love.</text>
+      </svg>
+    ),
+    caption: "Seen something on another site you loved? Share it — inspiration beats description.",
   },
 
-  /* ── Section F ── */
+  /* ── Section F: Look & Feel ── */
   F1: {
-    type: "gif",
-    src: "https://media.tenor.com/6Rg7BWDOISMAAAAC/design-creative.gif",
-    caption:
-      "Feeling is design. These words shape every colour, font, and layout choice.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Mood board grid */}
+        {[
+          { label: "Premium", col: "#d4a93c", bg: "#1e2a14", x: 16, y: 14 },
+          { label: "Modern", col: "#3a7bd5", bg: "#0f1e30", x: 148, y: 14 },
+          { label: "Warm &\nFriendly", col: "#e67e22", bg: "#1e180e", x: 16, y: 84 },
+          { label: "Bold &\nStrong", col: "#c0392b", bg: "#1e0f0f", x: 148, y: 84 },
+        ].map(t => (
+          <g key={t.label}>
+            <rect x={t.x} y={t.y} width="124" height="66" rx="7" fill={t.bg} stroke={t.col} strokeWidth="1.5"/>
+            {/* Abstract shape representing the vibe */}
+            <rect x={t.x+8} y={t.y+8} width="46" height="28" rx="5" fill={t.col} opacity="0.2"/>
+            <rect x={t.x+14} y={t.y+13} width="34" height="18" rx="3" fill={t.col} opacity="0.4"/>
+            {t.label.split("\n").map((line, li) => (
+              <text key={li} x={t.x+62} y={t.y+22+li*13} fill={t.col} fontSize="9.5" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">{line}</text>
+            ))}
+            <rect x={t.x+8} y={t.y+48} width="108" height="5" rx="2.5" fill={t.col} opacity="0.3"/>
+          </g>
+        ))}
+        <text x="140" y="157" fill="#8a9ab5" fontSize="7" textAnchor="middle" fontFamily="sans-serif">Vibe words → colour palette → typography → layout.</text>
+      </svg>
+    ),
+    caption: "Choose words that describe the feeling you want. These shape every colour and font choice.",
   },
+
   F2: {
-    type: "gif",
-    src: "https://media.tenor.com/x0ltFGKSjm0AAAAC/browsing-internet.gif",
-    caption:
-      "A URL is worth a thousand words. Paste any site you admire and we'll decode the vibe.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Three browser thumbnails stacked/fanned — centred in 280px viewBox */}
+        {[2,1,0].map(i => (
+          <g key={i} transform={`translate(${i*10},${i*7})`}>
+            <rect x="30" y="14" width="208" height="116" rx="7" fill="#141e2e" stroke="#2a3a55" strokeWidth="1" opacity={1-i*0.2}/>
+            <rect x="30" y="14" width="208" height="18" rx="7" fill="#0f1c30" opacity={1-i*0.2}/>
+            <rect x="30" y="24" width="208" height="8" fill="#0f1c30" opacity={1-i*0.2}/>
+            <rect x="58" y="18" width="120" height="10" rx="4" fill="#1a3050" opacity={1-i*0.2}/>
+          </g>
+        ))}
+        {/* Front browser content */}
+        <rect x="36" y="48" width="196" height="46" fill="#1a3050" opacity="0.8"/>
+        <rect x="44" y="56" width="90" height="9" rx="3" fill="#d4a93c" opacity="0.7"/>
+        <rect x="44" y="70" width="120" height="5" rx="2.5" fill="#4a6fa5" opacity="0.5"/>
+        <rect x="44" y="80" width="100" height="5" rx="2.5" fill="#4a6fa5" opacity="0.4"/>
+        <rect x="44" y="96" width="80" height="14" rx="5" fill="#3a7bd5" opacity="0.7"/>
+        {/* URL with link icon */}
+        <text x="140" y="28" fill="#4a6fa5" fontSize="8" textAnchor="middle" fontFamily="monospace">www.admired-site.com</text>
+        <text x="140" y="136" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">One URL tells us more than a hundred adjectives.</text>
+        <text x="140" y="148" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">We'll extract the exact elements you love.</text>
+      </svg>
+    ),
+    caption: "Paste any URL you admire. A link is worth a thousand adjectives.",
   },
+
   F3: {
-    type: "gif",
-    src: "https://media.tenor.com/Hu-VlIjUgKEAAAAC/no-never.gif",
-    caption: "Hard no's are just as useful as yes's. Don't hold back here.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* 4 bad pattern cards with red X */}
+        {[
+          { lines: ["Auto-play", "video"], icon: "🎬", x: 16, y: 14 },
+          { lines: ["Tiny unreadable", "text"], icon: "🔍", x: 148, y: 14 },
+          { lines: ["Popup every", "2 seconds"], icon: "❌", x: 16, y: 86 },
+          { lines: ["Cluttered", "homepage"], icon: "🗑", x: 148, y: 86 },
+        ].map(b => (
+          <g key={b.lines[0]}>
+            <rect x={b.x} y={b.y} width="124" height="66" rx="6" fill="#1e1212" stroke="#c0392b" strokeWidth="1.2" opacity="0.85"/>
+            <text x={b.x+16} y={b.y+22} fontSize="16" fontFamily="sans-serif">{b.icon}</text>
+            {b.lines.map((ln, li) => (
+              <text key={li} x={b.x+62} y={b.y+21+li*13} fill="#e74c3c" fontSize="9" fontFamily="sans-serif" fontWeight="bold" textAnchor="middle">{ln}</text>
+            ))}
+            <line x1={b.x+8} y1={b.y+8} x2={b.x+26} y2={b.y+28} stroke="#e74c3c" strokeWidth="3" strokeLinecap="round" opacity="0.7"/>
+            <line x1={b.x+8} y1={b.y+28} x2={b.x+26} y2={b.y+8} stroke="#e74c3c" strokeWidth="3" strokeLinecap="round" opacity="0.7"/>
+            <rect x={b.x+8} y={b.y+48} width="108" height="5" rx="2.5" fill="#2a1a1a"/>
+            <rect x={b.x+8} y={b.y+57} width="80" height="5" rx="2.5" fill="#2a1a1a" opacity="0.6"/>
+          </g>
+        ))}
+        <text x="140" y="154" fill="#8a9ab5" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">What frustrates you? Tell us — we'll avoid every one.</text>
+      </svg>
+    ),
+    caption: "Knowing what you hate is just as useful as knowing what you love.",
   },
+
   F4_tone: {
-    type: "gif",
-    src: "https://media.tenor.com/7QCijMrIGsIAAAAC/color-palette-colors.gif",
-    caption: "Colour tone sets the emotional register of your entire site.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Split screen */}
+        {/* Left: Light/Airy */}
+        <rect x="16" y="16" width="116" height="114" rx="7" fill="#f0f4f8"/>
+        <rect x="16" y="16" width="116" height="22" rx="7" fill="#e8ecf0"/>
+        <rect x="16" y="30" width="116" height="8" fill="#e8ecf0"/>
+        <rect x="24" y="20" width="20" height="6" rx="2" fill="#2c3e50" opacity="0.7"/>
+        <rect x="24" y="46" width="80" height="8" rx="3" fill="#2c3e50" opacity="0.6"/>
+        <rect x="24" y="60" width="96" height="5" rx="2.5" fill="#7f8c8d" opacity="0.5"/>
+        <rect x="24" y="70" width="80" height="5" rx="2.5" fill="#7f8c8d" opacity="0.4"/>
+        <rect x="24" y="84" width="76" height="14" rx="5" fill="#2c3e50" opacity="0.8"/>
+        <text x="62" y="93" fill="#f0f4f8" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">Get Started</text>
+        <text x="74" y="116" fill="#7f8c8d" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Light · Airy · Open</text>
+        <text x="74" y="126" fill="#2c3e50" fontSize="8" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">Clean &amp; Professional</text>
+        {/* Divider */}
+        <line x1="140" y1="16" x2="140" y2="130" stroke="#2a3a55" strokeWidth="1.5" strokeDasharray="4 3"/>
+        {/* Right: Dark/Rich */}
+        <rect x="148" y="16" width="116" height="114" rx="7" fill="#0d1521"/>
+        <rect x="148" y="16" width="116" height="22" rx="7" fill="#0a1018"/>
+        <rect x="148" y="30" width="116" height="8" fill="#0a1018"/>
+        <rect x="156" y="20" width="20" height="6" rx="2" fill="#d4a93c" opacity="0.8"/>
+        <rect x="156" y="46" width="80" height="8" rx="3" fill="#e0e8f0" opacity="0.8"/>
+        <rect x="156" y="60" width="96" height="5" rx="2.5" fill="#4a6fa5" opacity="0.5"/>
+        <rect x="156" y="70" width="80" height="5" rx="2.5" fill="#4a6fa5" opacity="0.4"/>
+        <rect x="156" y="84" width="60" height="14" rx="5" fill="#d4a93c"/>
+        <text x="186" y="93" fill="#0d1521" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">Get Started</text>
+        <text x="206" y="116" fill="#4a6fa5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Dark · Rich · Bold</text>
+        <text x="206" y="126" fill="#d4a93c" fontSize="8" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">Premium &amp; Confident</text>
+        <text x="140" y="148" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Tone shapes the emotional first impression before a word is read.</text>
+      </svg>
+    ),
+    caption: "Light and open, or dark and rich? Colour tone sets the entire emotional register.",
   },
+
   F4_balance: {
-    type: "gif",
-    src: "https://media.tenor.com/lFLyJdE2gWoAAAAC/photo-layout-design.gif",
-    caption: "Photo-led vs text-led: both work, but for different goals.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Left: Image-heavy layout */}
+        <rect x="16" y="16" width="116" height="114" rx="7" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        <rect x="22" y="22" width="104" height="70" rx="4" fill="#1a3050"/>
+        {/* Photo placeholder icon */}
+        <rect x="40" y="38" width="68" height="38" rx="3" fill="#3a7bd5" opacity="0.3"/>
+        <circle cx="74" cy="52" r="8" fill="#3a7bd5" opacity="0.4"/>
+        <polygon points="48,72 74,44 100,72" fill="#3a7bd5" opacity="0.3"/>
+        <rect x="22" y="96" width="60" height="5" rx="2.5" fill="#2a3a55"/>
+        <rect x="22" y="106" width="50" height="5" rx="2.5" fill="#2a3a55" opacity="0.6"/>
+        <rect x="22" y="116" width="40" height="10" rx="4" fill="#3a7bd5" opacity="0.5"/>
+        <text x="74" y="143" fill="#3a7bd5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Photo-heavy</text>
+        {/* Divider */}
+        <line x1="140" y1="16" x2="140" y2="130" stroke="#2a3a55" strokeWidth="1.5" strokeDasharray="4 3"/>
+        {/* Right: Text-heavy layout */}
+        <rect x="148" y="16" width="116" height="114" rx="7" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        <rect x="154" y="24" width="96" height="8" rx="3" fill="#d4a93c" opacity="0.7"/>
+        {[0,1,2,3,4,5,6].map(i => (
+          <rect key={i} x="154" y={38+i*11} width={80+Math.sin(i)*16} height="5" rx="2.5" fill="#4a6fa5" opacity={0.5-i*0.04}/>
+        ))}
+        <rect x="154" y="115" width="60" height="12" rx="4" fill="#d4a93c" opacity="0.8"/>
+        <text x="212" y="143" fill="#d4a93c" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Text-heavy</text>
+        <text x="140" y="153" fill="#8a9ab5" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">Balance affects brand feel. Tell us your preference.</text>
+      </svg>
+    ),
+    caption: "Photo-heavy or text-heavy? The balance changes how visitors experience your brand.",
   },
+
   F4_structure: {
-    type: "gif",
-    src: "https://media.tenor.com/YNdXFuqGa78AAAAC/scroll-website.gif",
-    caption:
-      "Single-page scrolling vs multi-page: different experiences, different goals.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Left: Single-page scroll */}
+        <rect x="16" y="16" width="116" height="114" rx="7" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        <text x="74" y="28" fill="#d4a93c" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">Single Page</text>
+        {/* Vertical scroll sections */}
+        {["Hero","About","Services","Contact"].map((s, i) => (
+          <g key={s}>
+            <rect x="24" y={32+i*22} width="100" height="18" rx="3" fill={i===0?"#1a3050":"#141e2e"} stroke="#2a3a55" strokeWidth={i===0?1.5:0.5}/>
+            <rect x="30" y={36+i*22} width="40" height="5" rx="2" fill={i===0?"#d4a93c":"#2a3a55"} opacity={i===0?0.8:0.5}/>
+            <text x="112" y={44+i*22} fill="#4a6fa5" fontSize="7" textAnchor="end" fontFamily="sans-serif">{s}</text>
+          </g>
+        ))}
+        {/* Scroll arrow */}
+        <text x="74" y="128" fill="#4a6fa5" fontSize="16" textAnchor="middle">↕</text>
+        {/* Divider */}
+        <line x1="140" y1="16" x2="140" y2="130" stroke="#2a3a55" strokeWidth="1.5" strokeDasharray="4 3"/>
+        {/* Right: Multi-page nav */}
+        <rect x="148" y="16" width="116" height="114" rx="7" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        <text x="206" y="28" fill="#d4a93c" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">Multi-Page</text>
+        {/* Tab navigation */}
+        <rect x="152" y="32" width="108" height="14" rx="3" fill="#0f1c30"/>
+        {["Home","About","Work","Contact"].map((s, i) => (
+          <g key={s}>
+            <rect x={154+i*26} y={33} width="24" height="12" rx="2" fill={i===0?"#d4a93c":"#1a2640"} opacity={i===0?0.9:0.6}/>
+            <text x={166+i*26} y="42" fill={i===0?"#0d1521":"#8a9ab5"} fontSize="6.5" textAnchor="middle" fontFamily="sans-serif">{s}</text>
+          </g>
+        ))}
+        {/* Page content */}
+        <rect x="152" y="50" width="108" height="70" rx="3" fill="#1a2640"/>
+        <rect x="160" y="58" width="80" height="8" rx="3" fill="#d4a93c" opacity="0.6"/>
+        <rect x="160" y="72" width="90" height="5" rx="2.5" fill="#2a3a55" opacity="0.5"/>
+        <rect x="160" y="82" width="70" height="5" rx="2.5" fill="#2a3a55" opacity="0.4"/>
+        <text x="140" y="148" fill="#8a9ab5" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">Both are valid — content volume drives the choice.</text>
+      </svg>
+    ),
+    caption: "One long scrolling page, or separate pages per topic? Both are valid — it depends on your content.",
   },
+
   F5: {
-    type: "gif",
-    src: "https://media.tenor.com/1MBR-6fPHg4AAAAC/colors-colour.gif",
-    caption:
-      "Colour communicates trust, personality, and industry before a visitor reads a word.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Palette card */}
+        <rect x="30" y="16" width="220" height="96" rx="9" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        {/* 4 colour swatches */}
+        {[
+          { col: "#1a2e4a", label: "Navy", role: "Primary" },
+          { col: "#d4a93c", label: "Gold", role: "Accent" },
+          { col: "#e8ecf0", label: "Light", role: "Background" },
+          { col: "#2c3e50", label: "Dark", role: "Text" },
+        ].map((sw, i) => (
+          <g key={i}>
+            <rect x={38+i*52} y="24" width="44" height="54" rx="5" fill={sw.col}/>
+            <text x={60+i*52} y="88" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">{sw.label}</text>
+            <text x={60+i*52} y="100" fill="#4a6fa5" fontSize="7" textAnchor="middle" fontFamily="sans-serif">{sw.role}</text>
+          </g>
+        ))}
+        {/* Palette label */}
+        <text x="140" y="128" fill="#d4a93c" fontSize="8.5" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">Your Brand Palette</text>
+        {/* Arrows showing usage */}
+        <text x="140" y="140" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Colours = instant personality. Share hex codes,</text>
+        <text x="140" y="152" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">brand guidelines, or even a logo — we'll match it.</text>
+      </svg>
+    ),
+    caption: "Colours communicate personality before a single word is read. Share what you have.",
   },
 
-  /* ── Section G ── */
+  /* ── Section G: Practical Details ── */
   G1: {
-    type: "gif",
-    src: "https://media.tenor.com/N_wgp_MCHMgAAAAC/checklist-check.gif",
-    caption:
-      "Every asset you already have saves time and money. Tick what's ready.",
-  },
-  G2: {
-    type: "gif",
-    src: "https://media.tenor.com/JEW_jqcHsKkAAAAC/domain-internet.gif",
-    caption:
-      "Your domain name is your permanent address on the internet. It matters.",
-  },
-  G3: {
-    type: "gif",
-    src: "https://media.tenor.com/3QqJVRgSS8EAAAAC/phone-calling.gif",
-    caption:
-      "How visitors reach you shapes how many actually do. More options = more conversions.",
-  },
-  G4: {
-    type: "gif",
-    src: "https://media.tenor.com/iyRMWX1h2bkAAAAC/social-media-icons.gif",
-    caption:
-      "Social links extend your digital presence and build trust through visibility.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Clipboard */}
+        <rect x="50" y="20" width="180" height="120" rx="7" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        <rect x="96" y="14" width="88" height="16" rx="5" fill="#1a2640" stroke="#2a3a55" strokeWidth="1"/>
+        <rect x="50" y="20" width="180" height="16" rx="7" fill="#0f1c30"/>
+        <rect x="50" y="28" width="180" height="8" fill="#0f1c30"/>
+        {/* Checklist items */}
+        {[
+          { label: "Logo file (.png / .svg)", done: true },
+          { label: "Professional photos", done: true },
+          { label: "Website copy / text", done: true },
+          { label: "Domain name", done: false },
+          { label: "Brand guidelines", done: false },
+        ].map((item, i) => (
+          <g key={i}>
+            <rect x="68" y={44+i*18} width="16" height="16" rx="4" fill={item.done?"#2ecc71":"#1a2640"} stroke={item.done?"#2ecc71":"#2a3a55"} strokeWidth="1.2"/>
+            {item.done && <text x="76" y={57+i*18} fill="#0d1521" fontSize="11" textAnchor="middle" fontFamily="sans-serif">✓</text>}
+            <rect x="92" y={49+i*18} width={item.done?130:110} height="6" rx="3" fill={item.done?"#4a6fa5":"#2a3a55"} opacity={item.done?0.7:0.4}/>
+            {!item.done && <text x="218" y={57+i*18} fill="#e74c3c" fontSize="8" textAnchor="middle" fontFamily="sans-serif">needed</text>}
+          </g>
+        ))}
+        <text x="140" y="152" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Each ✓ = one less delay. Missing items = extra cost &amp; time.</text>
+      </svg>
+    ),
+    caption: "Tick everything you already have ready. Every asset saves time and budget.",
   },
 
-  /* ── Section H ── */
+  G2: {
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Browser address bar */}
+        <rect x="20" y="30" width="240" height="36" rx="8" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        <circle cx="40" cy="48" r="8" fill="#2ecc71" opacity="0.3"/>
+        <text x="40" y="52" fill="#2ecc71" fontSize="10" textAnchor="middle" fontFamily="sans-serif">🔒</text>
+        <rect x="56" y="38" width="190" height="20" rx="5" fill="#0f1c30"/>
+        <text x="150" y="52" fill="#d4a93c" fontSize="10" textAnchor="middle" fontFamily="monospace">yourbusiness.com.au</text>
+        {/* Domain breakdown labels */}
+        <line x1="80" y1="74" x2="80" y2="96" stroke="#4a6fa5" strokeWidth="1" strokeDasharray="3 2"/>
+        <text x="80" y="106" fill="#4a6fa5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">www</text>
+        <line x1="136" y1="74" x2="136" y2="96" stroke="#d4a93c" strokeWidth="1" strokeDasharray="3 2"/>
+        <text x="148" y="106" fill="#d4a93c" fontSize="8" textAnchor="middle" fontFamily="sans-serif">yourbusiness</text>
+        <line x1="208" y1="74" x2="208" y2="96" stroke="#2ecc71" strokeWidth="1" strokeDasharray="3 2"/>
+        <text x="222" y="106" fill="#2ecc71" fontSize="8" textAnchor="middle" fontFamily="sans-serif">.com.au</text>
+        <text x="80" y="118" fill="#8a9ab5" fontSize="7" textAnchor="middle" fontFamily="sans-serif">subdomain</text>
+        <text x="148" y="118" fill="#8a9ab5" fontSize="7" textAnchor="middle" fontFamily="sans-serif">your name</text>
+        <text x="222" y="118" fill="#8a9ab5" fontSize="7" textAnchor="middle" fontFamily="sans-serif">extension</text>
+        <text x="140" y="136" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Your domain is your permanent address on the internet.</text>
+        <text x="140" y="148" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Own it before someone else does — usually $20/yr.</text>
+      </svg>
+    ),
+    caption: "Your domain is your permanent address on the internet — e.g. yourbusiness.com.au",
+  },
+
+  G3: {
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* 3 contact method icons */}
+        {[
+          { icon: "📞", label: "Phone", sub: "Immediate.\nHigh-intent leads.", col: "#2ecc71", x: 46 },
+          { icon: "✉️", label: "Email", sub: "Async.\nDetail-heavy queries.", col: "#3a7bd5", x: 140 },
+          { icon: "📋", label: "Form", sub: "Structured.\nFilters spam + quotes.", col: "#d4a93c", x: 234 },
+        ].map(c => (
+          <g key={c.x}>
+            <circle cx={c.x} cy="50" r="24" fill="#1a2640" stroke={c.col} strokeWidth="1.5"/>
+            <text x={c.x} y="58" textAnchor="middle" fontSize="17" fontFamily="sans-serif">{c.icon}</text>
+            <text x={c.x} y="88" fill={c.col} fontSize="9" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">{c.label}</text>
+            {c.sub.split("\n").map((line, i) => (
+              <text key={i} x={c.x} y={100+i*11} fill="#8a9ab5" fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">{line}</text>
+            ))}
+          </g>
+        ))}
+        <text x="140" y="144" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Each method suits a different type of client.</text>
+        <text x="140" y="154" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Pick what fits how your business operates.</text>
+      </svg>
+    ),
+    caption: "How do you want people to reach you? Phone, email, form — each suits different businesses.",
+  },
+
+  G4: {
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Social platform tiles */}
+        {[
+          { label: "LinkedIn", col: "#0077b5", icon: "in", x: 16, y: 10 },
+          { label: "Facebook", col: "#1877f2", icon: "f", x: 104, y: 10 },
+          { label: "Instagram", col: "#c13584", icon: "◉", x: 192, y: 10 },
+          { label: "YouTube", col: "#ff0000", icon: "▶", x: 16, y: 84 },
+          { label: "TikTok", col: "#69c9d0", icon: "♫", x: 104, y: 84 },
+          { label: "X (Twitter)", col: "#8a9ab5", icon: "𝕏", x: 192, y: 84 },
+        ].map(s => (
+          <g key={s.label}>
+            <rect x={s.x} y={s.y} width="76" height="66" rx="8" fill="#141e2e" stroke={s.col} strokeWidth="1.5"/>
+            <circle cx={s.x+38} cy={s.y+26} r="16" fill={s.col} opacity="0.2"/>
+            <text x={s.x+38} y={s.y+32} textAnchor="middle" fill={s.col} fontSize="15" fontFamily="sans-serif" fontWeight="bold">{s.icon}</text>
+            <text x={s.x+38} y={s.y+52} fill={s.col} fontSize="7.5" textAnchor="middle" fontFamily="sans-serif">{s.label}</text>
+            <rect x={s.x+10} y={s.y+57} width="56" height="3.5" rx="2" fill={s.col} opacity="0.3"/>
+          </g>
+        ))}
+        <text x="140" y="156" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Social links show you're active, credible, and reachable.</text>
+      </svg>
+    ),
+    caption: "Social links extend your presence and show visitors you're active and credible.",
+  },
+
+  /* ── Section H: Q & A ── */
   H1: {
-    type: "gif",
-    src: "https://media.tenor.com/svMllRU3LQIAAAAC/questions-ask.gif",
-    caption:
-      "There are no stupid questions. The more you ask now, the fewer surprises later.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Person with multiple question bubbles */}
+        <circle cx="70" cy="80" r="20" fill="#1a3050"/>
+        <circle cx="70" cy="73" r="10" fill="#4a6fa5"/>
+        <path d="M52 92 Q70 85 88 92 L90 112 Q70 118 50 112Z" fill="#4a6fa5"/>
+        {/* Question bubbles */}
+        {[
+          { x: 110, y: 22, q: "How long will it take?", w: 138 },
+          { x: 110, y: 60, q: "How much will it cost?", w: 136 },
+          { x: 110, y: 98, q: "What do I need to provide?", w: 158 },
+        ].map((b, i) => (
+          <g key={i}>
+            <rect x={b.x} y={b.y} width={b.w} height="26" rx="8" fill="#1a2640" stroke="#d4a93c" strokeWidth="1"/>
+            <polygon points={`${b.x},${b.y+10} ${b.x-8},${b.y+13} ${b.x},${b.y+16}`} fill="#1a2640"/>
+            <text x={b.x+b.w/2} y={b.y+16} fill="#d4a93c" fontSize="8.5" textAnchor="middle" fontFamily="sans-serif">{b.q}</text>
+          </g>
+        ))}
+        <text x="140" y="140" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Every question you ask now saves confusion later.</text>
+        <text x="140" y="152" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">There's no such thing as a stupid question here.</text>
+      </svg>
+    ),
+    caption: "No question is too basic. The more you ask now, the fewer surprises at launch.",
   },
+
   H2: {
-    type: "gif",
-    src: "https://media.tenor.com/MGWN1bPWjacAAAAC/worried-nervous.gif",
-    caption:
-      "Concerns are completely normal. Write them down and we'll address every one.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Notepad */}
+        <rect x="50" y="16" width="180" height="120" rx="7" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        <rect x="50" y="16" width="180" height="18" rx="7" fill="#1a2640"/>
+        <rect x="50" y="26" width="180" height="8" fill="#1a2640"/>
+        <text x="140" y="29" fill="#d4a93c" fontSize="9" textAnchor="middle" fontFamily="sans-serif" fontWeight="bold">My Concerns</text>
+        {/* Concern lines */}
+        {[
+          "What if I don't like the design?",
+          "What if it goes over budget?",
+          "What if it takes too long?",
+          "What if I need changes later?",
+        ].map((c, i) => (
+          <g key={i}>
+            <text x="68" y={52+i*20} fill="#e74c3c" fontSize="12" fontFamily="sans-serif">•</text>
+            <rect x="80" y={44+i*20} width={140-i*8} height="7" rx="3" fill="#1a3050"/>
+            <text x="84" y={52+i*20} fill="#8a9ab5" fontSize="8" fontFamily="sans-serif">{c}</text>
+          </g>
+        ))}
+        {/* Check resolution */}
+        <rect x="62" y="126" width="156" height="4" rx="2" fill="#2ecc71" opacity="0.3"/>
+        <text x="140" y="148" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Write every concern — we address each one before work begins.</text>
+      </svg>
+    ),
+    caption: "Concerns are completely normal. Write them down and we will address every single one.",
   },
+
   H3: {
-    type: "gif",
-    src: "https://media.tenor.com/zp_sHuvNm1IAAAAC/no-thanks.gif",
-    caption:
-      "Hard limits protect you and save everyone time. Be as specific as you like.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Boundary sign / shield */}
+        <path d="M140 16 L186 32 L186 86 Q186 108 140 122 Q94 108 94 86 L94 32Z" fill="#1e1212" stroke="#e74c3c" strokeWidth="2"/>
+        <text x="140" y="74" fill="#e74c3c" fontSize="36" textAnchor="middle" fontFamily="sans-serif">🚫</text>
+        {/* Hard limit tags */}
+        <rect x="16" y="124" width="116" height="18" rx="5" fill="#1e1212" stroke="#e74c3c" strokeWidth="1"/>
+        <text x="74" y="136" fill="#e74c3c" fontSize="8" textAnchor="middle" fontFamily="sans-serif">No stock photos of suits</text>
+        <rect x="148" y="124" width="116" height="18" rx="5" fill="#1e1212" stroke="#e74c3c" strokeWidth="1"/>
+        <text x="206" y="136" fill="#e74c3c" fontSize="8" textAnchor="middle" fontFamily="sans-serif">No autoplay video/music</text>
+        <text x="140" y="152" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">Hard limits = fewer revisions. Be completely blunt.</text>
+      </svg>
+    ),
+    caption: "Hard limits save everyone time. Be as blunt as you like here.",
   },
+
   H4: {
-    type: "gif",
-    src: "https://media.tenor.com/nKJKBrQkiDYAAAAC/thinking-last-thoughts.gif",
-    caption:
-      "Final thoughts often contain the most important things. Don't hold back.",
+    type: "svg",
+    svg: (
+      <svg viewBox="0 0 280 160" xmlns="http://www.w3.org/2000/svg" style={{width:"100%",height:"100%"}}>
+        <rect width="280" height="160" fill="#0d1521" rx="8"/>
+        {/* Open notepad with pen */}
+        <rect x="40" y="16" width="180" height="122" rx="7" fill="#141e2e" stroke="#2a3a55" strokeWidth="1"/>
+        {/* Binding line */}
+        <line x1="88" y1="16" x2="88" y2="138" stroke="#2a3a55" strokeWidth="1.5"/>
+        {/* Ruled lines */}
+        {[0,1,2,3,4,5,6].map(i => (
+          <line key={i} x1="96" y1={38+i*14} x2="210" y2={38+i*14} stroke="#1a2640" strokeWidth="1"/>
+        ))}
+        {/* Handwritten-style text on lines */}
+        <rect x="96" y="32" width="100" height="7" rx="2" fill="#4a6fa5" opacity="0.4"/>
+        <rect x="96" y="46" width="80" height="7" rx="2" fill="#4a6fa5" opacity="0.3"/>
+        <rect x="96" y="60" width="110" height="7" rx="2" fill="#4a6fa5" opacity="0.35"/>
+        <rect x="96" y="74" width="70" height="7" rx="2" fill="#4a6fa5" opacity="0.25"/>
+        {/* Pen */}
+        <g transform="rotate(-30,185,90)">
+          <rect x="178" y="72" width="10" height="50" rx="4" fill="#d4a93c"/>
+          <polygon points="178,122 188,122 183,135" fill="#e0e8f0"/>
+          <rect x="178" y="72" width="10" height="8" rx="2" fill="#b8860b"/>
+        </g>
+        <text x="140" y="146" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">This is an open field — no format required.</text>
+        <text x="140" y="156" fill="#8a9ab5" fontSize="8" textAnchor="middle" fontFamily="sans-serif">The best insights often live here.</text>
+      </svg>
+    ),
+    caption: "Final thoughts often contain the most important things. Don't hold back.",
   },
 };
 
@@ -1033,71 +1870,71 @@ function TipPanel({ tipKey }) {
 
 /* ─────────────────────────────────────────
    VISUAL AID COMPONENT
-   All entries are GIFs. Click thumbnail → full lightbox.
+   All entries are inline SVG infographics.
+   Click thumbnail → popover via React Portal
+   (portal bypasses ancestor transform/filter
+   stacking contexts that break position:fixed)
 ───────────────────────────────────────── */
 function VisualAid({ visKey }) {
-  const [lightbox, setLightbox] = useState(false);
+  const [popover, setPopover] = useState(false);
   const v = VISUALS[visKey];
   if (!v) return null;
+
+  const close = () => setPopover(false);
+
+  // Close on Escape key
+  useEffect(() => {
+    if (!popover) return;
+    const onKey = (e) => { if (e.key === "Escape") close(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [popover]);
 
   return (
     <>
       <div
         className="visual-aid"
-        onClick={() => setLightbox(true)}
+        onClick={() => setPopover(true)}
         role="button"
         tabIndex={0}
         title="Click to enlarge"
-        aria-label={`View full image: ${v.caption}`}
-        onKeyDown={(e) => e.key === "Enter" && setLightbox(true)}
+        aria-label={`View infographic: ${v.caption}`}
+        onKeyDown={(e) => e.key === "Enter" && setPopover(true)}
       >
-        <div className="visual-aid-expand-hint">🔍 Click to enlarge</div>
-        <img
-          src={v.src}
-          alt={v.caption}
-          className="visual-aid-media gif"
-          loading="lazy"
-          referrerPolicy="no-referrer"
-          crossOrigin="anonymous"
-          onError={(e) => {
-            e.target.closest(".visual-aid").style.display = "none";
-          }}
-        />
+        <div className="visual-aid-expand-hint">🔍 enlarge</div>
+        <div className="visual-aid-svg-thumb">
+          {v.svg}
+        </div>
         <div className="visual-aid-caption">{v.caption}</div>
       </div>
 
-      {lightbox && (
-        <div
-          className="va-lightbox"
-          onClick={() => setLightbox(false)}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Image lightbox"
-        >
+      {popover && createPortal(
+        <>
+          {/* Backdrop — rendered on document.body, immune to ancestor stacking contexts */}
           <div
-            className="va-lightbox-inner"
-            onClick={(e) => e.stopPropagation()}
+            className="va-backdrop"
+            onClick={close}
+            aria-hidden="true"
+          />
+          {/* Popover panel */}
+          <div
+            className="va-popover"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Enlarged infographic"
           >
             <button
-              className="va-lightbox-close"
-              onClick={() => setLightbox(false)}
+              className="va-popover-close"
+              onClick={close}
               aria-label="Close"
-            >
-              ✕
-            </button>
-            <img
-              src={v.src}
-              alt={v.caption}
-              className="va-lightbox-img"
-              referrerPolicy="no-referrer"
-              crossOrigin="anonymous"
-              onError={(e) => {
-                e.target.style.display = "none";
-              }}
-            />
-            <div className="va-lightbox-caption">{v.caption}</div>
+            >✕</button>
+            <div className="va-popover-svg">
+              {v.svg}
+            </div>
+            <div className="va-popover-caption">{v.caption}</div>
           </div>
-        </div>
+        </>,
+        document.body
       )}
     </>
   );
@@ -1234,6 +2071,7 @@ export default function Home() {
   });
   const [step, setStep] = useState(0); // 0 = intro, 1–8 = sections A–H
   const [highestStep, setHighestStep] = useState(0); // furthest section visited
+  const [visitedSteps, setVisitedSteps] = useState(new Set()); // steps the user has actually landed on
   const [animDir, setAnimDir] = useState("right"); // for slide direction
   const [saveStatus, setSaveStatus] = useState("saved");
   const [saveTime, setSaveTime] = useState("");
@@ -1245,6 +2083,17 @@ export default function Home() {
   const toastTimer = useRef(null);
   const emailjsReady = useRef(false);
   const sectionRef = useRef(null);
+
+  // Returns true if the section (by letter id e.g. 'A') has any filled fields
+  const sectionHasData = (sectionId) => {
+    const prefix = sectionId.toUpperCase();
+    return Object.entries(form).some(([key, val]) => {
+      if (!key.startsWith(prefix)) return false;
+      if (Array.isArray(val)) return val.length > 0;
+      if (typeof val === 'boolean') return val === true;
+      return typeof val === 'string' && val.trim() !== '';
+    });
+  };
 
   const completion = calcCompletion(form);
   const today = new Date().toLocaleDateString("en-AU", {
@@ -1348,7 +2197,17 @@ export default function Home() {
 
   const goToStep = useCallback((newStep, dir = "right") => {
     setAnimDir(dir);
-    setStep(newStep);
+    // Mark the step we are LEAVING as visited (if it's a real section)
+    setStep((prev) => {
+      if (prev >= 1) {
+        setVisitedSteps((vs) => {
+          const next = new Set(vs);
+          next.add(prev);
+          return next;
+        });
+      }
+      return newStep;
+    });
     setHighestStep((prev) => Math.max(prev, newStep));
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2254,6 +3113,12 @@ export default function Home() {
               sub: "A secure section for investors to access project details",
             },
             {
+              id: "fut_none",
+              value: "None of these apply",
+              label: "None of these / not sure yet",
+              sub: "Skip this section for now",
+            },
+            {
               id: "fut_newsletter",
               value: "Mailing list or newsletter",
               label: "Mailing list or newsletter",
@@ -2472,6 +3337,12 @@ export default function Home() {
                   value: "Outdated look",
                   label: "Outdated look",
                   sub: "Looks old-fashioned or neglected",
+                },
+                {
+                  id: "dis_none",
+                  value: "None of these / no strong dislikes",
+                  label: "None of these",
+                  sub: "No strong dislikes at this stage",
                 },
               ].map(({ id, value, label, sub }) => (
                 <CheckItem
@@ -2806,6 +3677,12 @@ export default function Home() {
               label: "Office or postal address",
               sub: "Only if you have a physical office that visitors could come to",
             },
+            {
+              id: "cm_none",
+              value: "Not sure yet / decide later",
+              label: "Not sure yet",
+              sub: "We'll figure this out when we get closer to launch",
+            },
           ].map(({ id, value, label, sub }) => (
             <CheckItem
               key={id}
@@ -2951,7 +3828,7 @@ export default function Home() {
         <header className="site-header">
           <div className="site-header-inner">
             <div className="site-header-mark" aria-label="PB monogram">
-              <img src="/favicon.svg" width="40" height="40" alt="PB" draggable="false" />
+              <img src="/favicon.svg" width="32" height="32" alt="PB" draggable="false" />
             </div>
             <div className="site-header-text">
               <div className="brand">Prabesh Bhetwal · Client Briefing</div>
@@ -2992,7 +3869,7 @@ export default function Home() {
       <header className="site-header">
         <div className="site-header-inner">
           <div className="site-header-mark" aria-label="PB monogram">
-            <img src="/favicon.svg" width="40" height="40" alt="PB" draggable="false" />
+            <img src="/favicon.svg" width="32" height="32" alt="PB" draggable="false" />
           </div>
           <div className="site-header-text">
             <div className="brand">Prabesh Bhetwal · Client Briefing</div>
@@ -3014,7 +3891,10 @@ export default function Home() {
             <div className="wizard-steps">
               {SECTIONS.map((s, i) => {
                 const sIdx = i + 1;
-                const isDone = step > sIdx;
+                // Done = user has visited this step AND filled at least one field in it
+                const hasData = sectionHasData(s.id);
+                const wasVisited = visitedSteps.has(sIdx);
+                const isDone = wasVisited && hasData && step !== sIdx;
                 const isActive = step === sIdx;
                 return (
                   <div
@@ -3028,7 +3908,7 @@ export default function Home() {
                   >
                     <div
                       className="w-step-dot"
-                      style={isActive || isDone ? { background: s.color, borderColor: s.color, color: '#fff' } : undefined}
+                      style={isActive ? { background: s.color, borderColor: s.color, color: '#fff' } : isDone ? { background: s.color, borderColor: s.color, color: '#fff' } : undefined}
                     >
                       {isDone ? "✓" : sIdx}
                     </div>
@@ -3088,29 +3968,29 @@ export default function Home() {
               <p>This form will help turn your ideas for your new website into a clear, practical plan. There are no wrong answers — the goal is simply to understand what you want, who it is for, and what it should achieve for your business.</p>
               <p>The form is split into <strong>8 short sections</strong>. Each section focuses on one aspect of your website. You can complete them in any order and take as many breaks as you like — your answers are <strong>automatically saved</strong> as you type.</p>
               <p>If any question is unclear, skip it and write your question in <strong><span style={{ whiteSpace: "nowrap" }}>Section 8 — Q &amp; A</span></strong> at the end. When you're finished, you can submit your answers directly or print a copy to discuss in person.</p>
-              <div style={{ marginTop: "28px" }}>
+              <div style={{ marginTop: "18px" }}>
                 <div style={{
                   display: "grid",
                   gridTemplateColumns: "repeat(4, 1fr)",
-                  gap: "8px",
-                  marginBottom: "28px",
+                  gap: "6px",
+                  marginBottom: "18px",
                 }}>
                   {SECTIONS.map((s) => (
                     <div key={s.id} style={{
                       display: "flex",
                       alignItems: "center",
-                      gap: "9px",
-                      fontSize: "13px",
+                      gap: "7px",
+                      fontSize: "12px",
                       color: "var(--text-mid)",
-                      padding: "10px 12px",
+                      padding: "7px 10px",
                       background: "var(--bg)",
                       border: `1.5px solid var(--border)`,
-                      borderRadius: "9px",
+                      borderRadius: "7px",
                       fontWeight: 500,
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                     }}>
-                      <span style={{ fontSize: "17px", lineHeight: 1, flexShrink: 0 }}>{s.emoji}</span>
+                      <span style={{ fontSize: "14px", lineHeight: 1, flexShrink: 0 }}>{s.emoji}</span>
                       <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{s.label}</span>
                     </div>
                   ))}
@@ -3119,7 +3999,7 @@ export default function Home() {
                   <button
                     type="button"
                     className="btn-nav btn-nav-primary"
-                    style={{ fontSize: "15px", padding: "12px 44px", minHeight: "48px" }}
+                    style={{ fontSize: "13px", padding: "9px 36px", minHeight: "38px" }}
                     onClick={() => goToStep(1, "right")}
                   >
                     Get started →
@@ -3150,7 +4030,7 @@ export default function Home() {
               {SECTION_RENDERERS[currentSectionIdx]()}
 
               {/* Section navigation */}
-              <div className="wizard-nav" style={{ margin: "0 32px 28px" }}>
+              <div className="wizard-nav" style={{ margin: "0 18px 18px" }}>
                 <div className="wizard-nav-left">
                   <button
                     type="button"
@@ -3166,10 +4046,12 @@ export default function Home() {
                 </div>
                 <div className="wizard-nav-right">
                   {isLastSection ? (
+                    /* Last section — submit lives in the action bar only */
                     <button
                       type="button"
                       className="btn-nav btn-nav-gold"
                       onClick={() => setModalOpen(true)}
+                      title="Submit your answers"
                     >
                       Submit answers ✓
                     </button>
@@ -3274,8 +4156,8 @@ export default function Home() {
                 Print / PDF
               </button>
 
-              {/* Submit — only appears after all 8 sections visited */}
-              {allSectionsVisited ? (
+              {/* Submit — only in action bar when all sections visited AND not already on last section (which has its own submit in-nav) */}
+              {allSectionsVisited && !isLastSection ? (
                 <button
                   type="button"
                   onClick={() => setModalOpen(true)}
@@ -3283,7 +4165,7 @@ export default function Home() {
                 >
                   Submit answers ✓
                 </button>
-              ) : (
+              ) : !allSectionsVisited ? (
                 /* Completion nudge — shows how many sections remain */
                 <div
                   style={{
@@ -3299,7 +4181,7 @@ export default function Home() {
                   {SECTIONS.length - highestStep} section
                   {SECTIONS.length - highestStep !== 1 ? "s" : ""} remaining
                 </div>
-              )}
+              ) : null}
             </div>
           );
         })()}

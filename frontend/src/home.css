@@ -20,15 +20,15 @@
   --border:      #dedad2;
   --border-dark: #c8c3b8;
   --success:     #2d7a4a;
-  --radius:      12px;
-  --radius-sm:   8px;
+  --radius:      10px;
+  --radius-sm:   6px;
   --shadow-sm:   0 1px 4px rgba(27,43,75,0.07);
   --shadow-md:   0 4px 20px rgba(27,43,75,0.10);
   --shadow-lg:   0 8px 40px rgba(27,43,75,0.14);
   --transition:  0.22s cubic-bezier(0.4,0,0.2,1);
-  --header-h:    78px;   /* approximate site-header height */
-  --sidebar-w:  200px;   /* wizard nav sidebar width */
-  --pct-bar-w:   48px;   /* right-edge progress pill width */
+  --header-h:    58px;   /* reduced header height */
+  --sidebar-w:  172px;   /* narrower sidebar */
+  --pct-bar-w:   42px;   /* right-edge progress pill width */
 }
 
 html, body {
@@ -42,8 +42,8 @@ body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: var(--bg);
   color: var(--text);
-  line-height: 1.6;
-  font-size: 14px;
+  line-height: 1.5;
+  font-size: 12px;
 }
 
 /* ================================================
@@ -78,11 +78,11 @@ body {
 .site-header-inner {
   max-width: 1160px;
   margin: 0 auto;
-  padding: 20px 28px 18px;
+  padding: 10px 20px 9px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 14px;
   position: relative;
   z-index: 1;
 }
@@ -90,11 +90,10 @@ body {
 /* Studio monogram mark */
 .site-header-mark {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
   box-shadow: 0 0 0 1px rgba(255,255,255,0.12), 0 4px 16px rgba(0,0,0,0.3);
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
   line-height: 0;
 }
@@ -107,26 +106,26 @@ body {
 
 .site-header .brand {
   font-family: "Lora", Georgia, serif;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 600;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.2em;
   color: var(--gold);
   text-transform: uppercase;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   opacity: 0.9;
 }
 
 .site-header .doc-title {
-  font-size: clamp(15px, 2vw, 19px);
+  font-size: clamp(13px, 1.6vw, 16px);
   font-weight: 700;
   color: #fff;
-  margin-bottom: 3px;
-  line-height: 1.25;
+  margin-bottom: 2px;
+  line-height: 1.2;
   letter-spacing: -0.01em;
 }
 
 .site-header .doc-meta {
-  font-size: 11px;
+  font-size: 10px;
   color: rgba(255,255,255,0.4);
   letter-spacing: 0.01em;
 }
@@ -163,20 +162,19 @@ body {
 .wizard-steps {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: 0 12px;
+  gap: 1px;
+  padding: 0 8px;
 }
 
 /* Each step row */
 .w-step {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 7px 12px;
-  border-radius: 8px;
+  gap: 7px;
+  padding: 5px 8px;
+  border-radius: 7px;
   cursor: pointer;
   position: relative;
-  /* The whole row slides right when active */
   transform: translateX(0);
   transition: transform 0.26s cubic-bezier(0.4,0,0.2,1),
               background 0.18s ease;
@@ -190,29 +188,31 @@ body {
   background: none;
 }
 
-/* Active row — slide right, no background */
+/* Active row — slide right + solid highlight pill */
 .w-step.active {
   transform: translateX(6px);
-  background: none;
+  background: rgba(27,43,75,0.09);
+  border-radius: 7px;
   animation: stepRowActivate 0.28s cubic-bezier(0.4,0,0.2,1) both;
+  box-shadow: inset 3px 0 0 var(--gold, #b8962b);
 }
 
 @keyframes stepRowActivate {
-  from { transform: translateX(0);  opacity: 0.5; }
+  from { transform: translateX(0); opacity: 0.5; }
   to   { transform: translateX(6px); opacity: 1;  }
 }
 
 /* The dot / number badge */
 .w-step-dot {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   border: 1.5px solid var(--border-dark);
   background: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   color: var(--text-soft);
   flex-shrink: 0;
@@ -237,8 +237,8 @@ body {
 .w-step-label {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 12px;
+  gap: 4px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--text-soft);
   white-space: nowrap;
@@ -249,7 +249,7 @@ body {
 }
 
 .w-step-emoji {
-  font-size: 13px;
+  font-size: 11px;
   line-height: 1;
   flex-shrink: 0;
 }
@@ -257,6 +257,8 @@ body {
 .w-step.active .w-step-label {
   /* colour set by inline style from section data */
   font-weight: 700;
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
 }
 
 .w-step.done .w-step-label {
@@ -364,8 +366,8 @@ body {
 ================================================ */
 .container {
   margin-left: var(--sidebar-w);
-  margin-right: 60px;          /* clear the pct pill */
-  padding: 0 32px 100px;
+  margin-right: 50px;          /* clear the pct pill */
+  padding: 0 20px 20px;        /* bottom matches top spacing — no excess gap */
 }
 
 /* ================================================
@@ -383,7 +385,7 @@ body {
   background: var(--white);
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
-  padding: 36px 42px;
+  padding: 24px 30px;
   width: 100%;
   box-shadow: var(--shadow-md);
   animation: fadeUp 0.4s ease both;
@@ -391,16 +393,16 @@ body {
 
 .intro-card h2 {
   font-family: "Lora", Georgia, serif;
-  font-size: 20px;
+  font-size: 17px;
   color: var(--navy);
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .intro-card p {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-mid);
-  line-height: 1.7;
-  margin-bottom: 10px;
+  line-height: 1.6;
+  margin-bottom: 8px;
 }
 
 .intro-card p:last-child { margin-bottom: 0; }
@@ -486,7 +488,7 @@ body {
 ================================================ */
 .section-banner {
   border-radius: var(--radius) var(--radius) 0 0;
-  padding: 18px 28px 14px;
+  padding: 9px 16px 8px;
   position: relative;
   overflow: hidden;
   animation: fadeUp 0.3s ease both;
@@ -495,47 +497,47 @@ body {
 .section-banner::after {
   content: attr(data-emoji);
   position: absolute;
-  right: 24px;
+  right: 18px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 56px;
+  font-size: 40px;
   opacity: 0.13;
   pointer-events: none;
   line-height: 1;
 }
 
 .section-banner .step-label {
-  font-size: 11px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  margin-bottom: 6px;
+  margin-bottom: 3px;
   opacity: 0.7;
 }
 
 .section-banner h2 {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   font-family: "Lora", Georgia, serif;
-  font-size: 18px;
+  font-size: 13px;
   font-weight: 700;
-  margin-bottom: 3px;
-  line-height: 1.25;
+  margin-bottom: 1px;
+  line-height: 1.2;
 }
 
 .banner-emoji {
-  font-size: 22px;
+  font-size: 16px;
   line-height: 1;
   flex-shrink: 0;
   filter: drop-shadow(0 1px 2px rgba(0,0,0,0.18));
 }
 
 .section-banner p {
-  font-size: 13px;
+  font-size: 10px;
   opacity: 0.75;
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 /* Banner colour schemes — one per section */
@@ -567,44 +569,44 @@ body {
 }
 
 .section-body {
-  padding: 18px 24px 22px;
+  padding: 8px 14px 12px;
 }
 
 /* ================================================
    QUESTION GROUP
 ================================================ */
 .q-group {
-  padding: 12px 0;
+  padding: 6px 0;
 }
 
 .q-group:first-child { padding-top: 0; }
 
 .q-label {
   display: block;
-  font-size: 15px;
+  font-size: 11.5px;
   font-weight: 600;
   color: var(--navy);
-  margin-bottom: 5px;
-  line-height: 1.45;
+  margin-bottom: 4px;
+  line-height: 1.4;
 }
 
 .optional {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   background: var(--border);
   color: var(--text-soft);
   border-radius: 4px;
-  padding: 1px 7px;
-  margin-left: 6px;
+  padding: 1px 6px;
+  margin-left: 5px;
   vertical-align: middle;
 }
 
 .q-hint {
   display: block;
-  font-size: 13px;
+  font-size: 10px;
   color: var(--text-soft);
-  margin-bottom: 8px;
-  line-height: 1.55;
+  margin-bottom: 6px;
+  line-height: 1.45;
 }
 
 .q-example {
@@ -708,24 +710,24 @@ input[type="url"],
 textarea {
   width: 100%;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 11.5px;
   color: var(--text);
   background: var(--white);
   border: 1.5px solid var(--border-dark);
   border-radius: var(--radius-sm);
-  padding: 10px 13px;
+  padding: 5px 9px;
   outline: none;
   transition: border-color var(--transition), box-shadow var(--transition);
-  line-height: 1.55;
+  line-height: 1.5;
   resize: vertical;
-  min-height: 44px;
+  min-height: 30px;
 }
 
-input[type="number"] { min-height: 40px; }
+input[type="number"] { min-height: 28px; }
 
 input:focus, textarea:focus {
   border-color: var(--navy);
-  box-shadow: 0 0 0 3px rgba(27,43,75,0.10);
+  box-shadow: 0 0 0 2px rgba(27,43,75,0.09);
 }
 
 input::placeholder, textarea::placeholder {
@@ -733,8 +735,8 @@ input::placeholder, textarea::placeholder {
   font-style: italic;
 }
 
-textarea { min-height: 90px; }
-textarea.ta-tall { min-height: 120px; }
+textarea { min-height: 58px; }
+textarea.ta-tall { min-height: 74px; }
 
 /* ================================================
    CHECKBOXES & RADIOS
@@ -1017,10 +1019,10 @@ textarea.ta-tall { min-height: 120px; }
 }
 
 .btn-nav {
-  min-height: 42px;
-  padding: 10px 22px;
-  border-radius: 9px;
-  font-size: 14px;
+  min-height: 30px;
+  padding: 5px 14px;
+  border-radius: 7px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   font-family: inherit;
@@ -1334,7 +1336,6 @@ textarea.ta-tall { min-height: 120px; }
 .visual-aid {
   border-radius: var(--radius);
   overflow: hidden;
-  margin-bottom: 16px;
   border: 1.5px solid var(--border);
   background: #0f1520;
   box-shadow: var(--shadow-sm);
@@ -1342,6 +1343,27 @@ textarea.ta-tall { min-height: 120px; }
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   position: relative;
+  /* Default: constrained thumbnail floated to the right —
+     works whether inside q-with-visual grid or loose in q-group/pref-block */
+  width: 160px;
+  flex-shrink: 0;
+  margin: 0 0 10px 12px;
+  float: right;
+}
+
+/* Inside the q-with-visual grid the grid column already constrains width —
+   undo float so it fills its cell naturally */
+.q-with-visual .visual-aid {
+  float: none;
+  width: 100%;
+  margin: 0;
+}
+
+/* Inside visual-panel-col (sticky right column) — fill the column */
+.visual-panel-col .visual-aid {
+  float: none;
+  width: 100%;
+  margin: 0 0 10px;
 }
 
 .visual-aid:hover {
@@ -1372,18 +1394,21 @@ textarea.ta-tall { min-height: 120px; }
   opacity: 1;
 }
 
-.visual-aid-media {
+/* SVG infographic thumbnail container
+   max-height enforces consistent thumbnail size regardless of column width */
+.visual-aid-svg-thumb {
   width: 100%;
-  display: block;
-  object-fit: cover;
-  max-height: 220px;
-  background: #0f1520;
+  aspect-ratio: 280 / 160;
+  max-height: 92px;       /* 160px col × 160/280 ≈ 91px — keeps all thumbs identical */
+  display: flex;
+  align-items: stretch;
+  background: #0d1521;
+  overflow: hidden;
 }
-
-.visual-aid-media.gif {
-  max-height: 190px;
-  object-fit: contain;
-  background: #0f1520;
+.visual-aid-svg-thumb svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .visual-aid-caption {
@@ -1396,49 +1421,62 @@ textarea.ta-tall { min-height: 120px; }
   line-height: 1.45;
 }
 
-/* ── Lightbox ── */
-.va-lightbox {
+/* ── Backdrop for SVG popover
+   Rendered via React Portal directly on document.body —
+   no ancestor stacking context interference ── */
+.va-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 9000;
-  background: rgba(5,10,20,0.92);
-  backdrop-filter: blur(12px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  animation: fadeIn 0.18s ease both;
-  cursor: zoom-out;
-  overflow: hidden;
+  z-index: 8999;
+  background: rgba(5,10,20,0.75);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
-.va-lightbox-inner {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  max-width: min(640px, 90vw);
-  max-height: 90vh;
-  width: 100%;
-  background: #0f1520;
+/* ── SVG Infographic Popover
+   Rendered via React Portal → always anchored to true viewport.
+   Centred in the form content area (right of sidebar, above action bar).
+   Max dimensions prevent it feeling too wide on large screens. ── */
+.va-popover {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(820px, calc(100vw - var(--sidebar-w) - 80px));
+  height: min(560px, calc(100vh - var(--header-h) - 80px));
+  z-index: 9000;
+  background: #0d1521;
   border-radius: 14px;
   overflow: hidden;
-  border: 1.5px solid rgba(184,150,43,0.4);
-  box-shadow: 0 30px 80px rgba(0,0,0,0.7);
-  cursor: default;
-  animation: pop 0.22s cubic-bezier(0.34,1.56,0.64,1) both;
+  border: 1.5px solid rgba(184,150,43,0.55);
+  box-shadow: 0 24px 72px rgba(0,0,0,0.7), 0 4px 16px rgba(0,0,0,0.4);
+  animation: expandFromRight 0.28s cubic-bezier(0.34,1.1,0.64,1) both;
+  display: flex;
+  flex-direction: column;
 }
 
-.va-lightbox-close {
+@keyframes expandFromRight {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.va-popover-close {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 30px;
-  height: 30px;
+  top: 7px;
+  right: 7px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.65);
+  background: rgba(0,0,0,0.7);
   color: #fff;
   border: none;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   display: flex;
@@ -1447,36 +1485,45 @@ textarea.ta-tall { min-height: 120px; }
   z-index: 10;
   transition: background 0.15s;
 }
-.va-lightbox-close:hover { background: rgba(184,150,43,0.8); }
+.va-popover-close:hover { background: rgba(184,150,43,0.85); }
 
-.va-lightbox-img {
-  display: block;
-  width: 100%;
-  /* flexbox child: grow to fill, shrink to fit, never overflow */
-  flex: 1 1 auto;
+/* SVG in popover — fills the entire popover area with preserved aspect ratio */
+.va-popover-svg {
+  flex: 1;
   min-height: 0;
-  max-height: calc(90vh - 52px);
-  object-fit: contain;
-  object-position: center;
-  background: #0f1520;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d1521;
+  padding: 20px;
+  overflow: hidden;
+}
+.va-popover-svg svg {
+  /* fill available space while respecting viewBox aspect ratio */
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  /* SVG with viewBox auto-scales; preserveAspectRatio defaults to xMidYMid meet */
 }
 
-.va-lightbox-caption {
-  flex-shrink: 0;
-  padding: 10px 16px 12px;
+.va-popover-caption {
+  padding: 10px 20px 12px;
   font-size: 13px;
-  color: rgba(255,255,255,0.65);
+  color: rgba(255,255,255,0.75);
   font-style: italic;
-  line-height: 1.45;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  background: rgba(0,0,0,0.3);
+  line-height: 1.5;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.4);
+  flex-shrink: 0;
 }
 
 /* Side-by-side layout: question on left, visual on right */
 .q-with-visual {
   display: grid;
-  grid-template-columns: 1fr 250px;
-  gap: 16px;
+  grid-template-columns: 1fr 160px;
+  gap: 10px;
   align-items: start;
 }
 
@@ -1486,8 +1533,8 @@ textarea.ta-tall { min-height: 120px; }
    Used when a VisualAid sits outside q-with-visual directly inside section-body */
 .section-visual-col {
   display: grid;
-  grid-template-columns: 1fr 250px;
-  gap: 16px;
+  grid-template-columns: 1fr 200px;
+  gap: 12px;
   align-items: start;
 }
 
@@ -1591,12 +1638,12 @@ input:focus, textarea:focus {
   transform: scale(1.18);
 }
 
-/* Visual aid image hover zoom */
-.visual-aid-media {
+/* Visual aid SVG thumb hover zoom */
+.visual-aid-svg-thumb {
   transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
 }
-.visual-aid:hover .visual-aid-media {
-  transform: scale(1.03);
+.visual-aid:hover .visual-aid-svg-thumb {
+  transform: scale(1.02);
 }
 
 /* Page block hover */
