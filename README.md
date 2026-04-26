@@ -38,7 +38,7 @@ Create a `.env` file in the `backend/` directory:
 
 ```env
 PORT=
-MONGODB_URI=mongodb://localhost:YOUR_MONGO_PORT/YOUR_DATABASE
+MONGODB_URI=mongodb://localhost:YOUR_MONGO_PORT/YOUR_DATABASE || Or put your MongoDB Atlas URI
 ```
 
 ### 2. Installation
