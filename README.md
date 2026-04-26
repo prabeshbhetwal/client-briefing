@@ -19,7 +19,7 @@ The workspace is divided into two main directories:
 
 ## Features
 
-- **Interactive Question Guides**: Specific routing for different clients (e.g., Bayview Guide, Client Guide).
+- **Interactive Question Guides**: Specific routing for different clients.
 - **Database Submissions**: Submissions are stored securely in a MongoDB database instead of relying on third-party email form handlers.
 - **Modern UI**: React-based components for a responsive and dynamic user experience.
 - **Concurrent Development**: Single command to run both frontend and backend development servers concurrently.
