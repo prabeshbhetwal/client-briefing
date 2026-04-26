@@ -1,4 +1,4 @@
-# PB Client Briefing (VinComm)
+# PB Client Briefing
 
 A client-facing website briefing tool and question guide. Clients fill out a multi-section form covering their business, goals, design preferences, and practical details, then submit it.
 
