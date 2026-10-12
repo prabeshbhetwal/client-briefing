@@ -243,6 +243,13 @@ try:
             page.screenshot(path=str(AUDIT / f'{label}-desktop.png'), full_page=True)
             page.set_viewport_size({'width': 375, 'height': 812})
             audit(f'{label}-mobile')
+            comparison = page.get_by_role('table', name='Website setup comparison')
+            comparison.focus()
+            expect(comparison).to_be_focused()
+            if comparison.evaluate('el => el.scrollWidth > el.clientWidth + 1'):
+                page.keyboard.press('ArrowRight')
+                page.wait_for_function("document.querySelector('.comparison').scrollLeft > 0")
+            results.append({'check': f'{label}-comparison-keyboard-access', 'pass': True})
             page.screenshot(path=str(AUDIT / f'{label}-mobile-viewport.png'))
             page.screenshot(path=str(AUDIT / f'{label}-mobile.png'), full_page=True)
             page.get_by_role('button', name='Submit answers', exact=True).click()

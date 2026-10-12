@@ -722,7 +722,7 @@ export default function ClientGuide() {
                 <p>Only needed when the website itself must manage leads, users, reminders, private files, or internal workflows.</p>
               </div>
             </div>
-            <table className="comparison">
+            <table className="comparison" tabIndex={0} aria-label="Website setup comparison">
               <thead>
                 <tr><th>Need</th><th>Recommended answer</th><th>Why it matters</th></tr>
               </thead>

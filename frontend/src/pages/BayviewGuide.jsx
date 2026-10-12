@@ -1154,7 +1154,7 @@ export default function BayviewGuide() {
                 <p>You get a private editing screen where you can create, update, hide, and delete project entries — no coding required.</p>
               </div>
             </div>
-            <table className="comparison">
+            <table className="comparison" tabIndex={0} aria-label="Website setup comparison">
               <thead>
                 <tr><th>Decision</th><th>Recommendation</th><th>Plain-English reason</th></tr>
               </thead>
