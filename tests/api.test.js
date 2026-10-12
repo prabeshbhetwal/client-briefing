@@ -194,7 +194,7 @@ test('actual startup with MONGODB_URI unset preserves the legacy default on an i
   await once(socket, 'listening');
   const port = socket.address().port;
   await new Promise(resolve => socket.close(resolve));
-  // Select the real default, then redirect the connection; never read user .env or connect to port 27017.
+  // Select the real default, then redirect to the owned fixture without reading user .env or its database.
   const preload = `
     import assert from 'node:assert/strict';
     import mongoose from ${JSON.stringify(new URL('../backend/node_modules/mongoose/index.js', import.meta.url).href)};
