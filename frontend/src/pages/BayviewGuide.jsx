@@ -1062,8 +1062,8 @@ export default function BayviewGuide() {
                 </p>
 
                 {/* Brief confirmation table */}
-                <div style={{ margin: '20px 0', fontSize: '14px' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fffbf0', border: '1px solid #ded3bd', borderRadius: '8px', overflow: 'hidden' }}>
+                <div className="brief-confirmation" role="region" aria-label="Brief confirmation answers" tabIndex={0} style={{ margin: '20px 0', fontSize: '14px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', background: '#fffbf0', border: '1px solid #ded3bd', borderRadius: '8px' }}>
                     <thead>
                       <tr style={{ background: '#183452' }}>
                         <th style={{ padding: '10px 12px', color: 'white', fontWeight: 600, fontSize: '11px', textTransform: 'uppercase', letterSpacing: '.06em', textAlign: 'left' }}>What you told us</th>

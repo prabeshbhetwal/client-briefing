@@ -112,7 +112,7 @@ try:
     base = f'http://127.0.0.1:{web_port}'
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
-        context = browser.new_context(viewport={'width': 1280, 'height': 900}, reduced_motion='reduce')
+        context = browser.new_context(viewport={'width': 1280, 'height': 900}, reduced_motion='reduce', has_touch=True)
         page = context.new_page()
         errors = []
         def record_error(error):
@@ -212,16 +212,31 @@ try:
                       const grid = panel.querySelector('.intro-grid');
                       const table = panel.querySelector('table');
                       const box = el => { const r=el.getBoundingClientRect(); return {left:r.left,right:r.right,width:r.width}; };
-                      const text = [...table.querySelectorAll('th,td')].flatMap(cell => {
+                      const cells = [...table.querySelectorAll('th,td')].map(cell => {
                         const range=document.createRange(); range.selectNodeContents(cell);
-                        return [...range.getClientRects()].map(r => ({left:r.left,right:r.right}));
+                        return {box:box(cell), text:[...range.getClientRects()].map(r => ({left:r.left,right:r.right}))};
                       });
+                      const text=cells.flatMap(cell=>cell.text);
                       return {viewport:innerWidth, panel:box(panel), grid:box(grid),
                         columns:getComputedStyle(grid).gridTemplateColumns, firstChild:box(grid.firstElementChild),
-                        table:box(table), textLeft:Math.min(...text.map(r=>r.left)), textRight:Math.max(...text.map(r=>r.right))};
+                        table:box(table), textLeft:Math.min(...text.map(r=>r.left)), textRight:Math.max(...text.map(r=>r.right)),
+                        textInsideCells:cells.every(cell=>cell.text.every(r=>r.left>=cell.box.left-1 && r.right<=cell.box.right+1))};
                     }"""))
+                    table_area = page.get_by_role('region', name='Brief confirmation answers')
+                    table_area.focus()
+                    expect(table_area).to_be_focused()
+                    top = table_area.bounding_box()['y']
+                    page.keyboard.press('PageDown')
+                    page.wait_for_function("before => document.querySelector('.brief-confirmation').getBoundingClientRect().top < before - 1", arg=top)
+                    last_answer = table_area.locator('tbody td').last
+                    last_answer.scroll_into_view_if_needed()
+                    last_answer.tap()
+                    expect(last_answer).to_contain_text('Projects section to be editable')
+                    table_area.screenshot(path=str(AUDIT / f'bayview-brief-{width}.png'))
+                    results.append({'check': f'bayview-brief-keyboard-touch-{width}', 'pass': True})
                 print('BAYVIEW_GEOMETRY:', json.dumps(measurements), flush=True)
-                assert all(m['table']['left'] >= 0 and m['textRight'] <= m['viewport'] + 1 for m in measurements), 'Brief confirmation text clips outside mobile viewport'
+                assert all(m['panel']['right'] <= m['viewport'] + 1 and m['table']['left'] >= 0
+                           and m['textRight'] <= m['viewport'] + 1 and m['textInsideCells'] for m in measurements), 'Brief confirmation text clips outside mobile viewport or cells'
                 page.set_viewport_size({'width': 1280, 'height': 900})
             audit(f'{label}-desktop')
             page.screenshot(path=str(AUDIT / f'{label}-desktop-viewport.png'))

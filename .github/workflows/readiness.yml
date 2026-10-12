@@ -82,5 +82,6 @@ jobs:
           path: |
             .audit/*.log
             .audit/*.json
+            .audit/bayview-brief-*.png
           retention-days: 7
           if-no-files-found: warn
