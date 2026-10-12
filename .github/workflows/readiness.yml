@@ -1,0 +1,88 @@
+name: Readiness
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: readiness-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  readiness:
+    name: API, browser and build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      CI: "true"
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - "127.0.0.1:27017:27017"
+        options: >-
+          --memory 1g
+          --cpus 1
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand({ping:1})'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            frontend/package-lock.json
+            backend/package-lock.json
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - name: Install locked app dependencies and test browser
+        run: |
+          npm ci --prefix frontend --no-fund --no-audit
+          npm ci --prefix backend --no-fund --no-audit
+          python -m venv .audit-venv
+          .audit-venv/bin/pip install playwright==1.63.0
+          PLAYWRIGHT_BROWSERS_PATH="$PWD/.audit/browsers" .audit-venv/bin/python -m playwright install --with-deps chromium
+      - name: Record exact tested commit
+        run: git rev-parse HEAD
+      - name: API integration and server lifecycle
+        env:
+          TEST_MONGODB_URI: mongodb://127.0.0.1:27017/client_briefing_test_api_${{ github.run_id }}_${{ github.run_attempt }}
+        run: |
+          mkdir -p .audit
+          set -o pipefail
+          npm test 2>&1 | tee .audit/ci-api.log
+      - name: Browser acceptance and accessibility
+        env:
+          TEST_MONGODB_URI: mongodb://127.0.0.1:27017/client_briefing_test_browser_${{ github.run_id }}_${{ github.run_attempt }}
+        run: |
+          set -o pipefail
+          npm run test:browser 2>&1 | tee .audit/ci-browser.log
+      - name: Production build and dependency audit
+        run: |
+          npm run build
+          npm audit --prefix frontend
+          npm audit --prefix backend
+      - name: Retain synthetic verification evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: readiness-${{ github.sha }}
+          path: |
+            .audit/*.log
+            .audit/*.json
+            .audit/bayview-brief-*.png
+          retention-days: 7
+          include-hidden-files: true
+          if-no-files-found: warn

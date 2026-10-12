@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { createPortal } from "react-dom";
+import { saveSubmission, downloadSummary, loadDraft } from '../submissions';
+import useDialog from '../useDialog';
 import "../home.css";
 
 /* ─────────────────────────────────────────
@@ -1062,10 +1064,6 @@ const VISUALS = {
 ───────────────────────────────────────── */
 const CONFIG = {
   developerName: "Prabesh Bhetwal",
-  emailjs_public_key: "fKgFK2YwaZ4q2H_8R",
-  emailjs_service_id: "personalprojects",
-  emailjs_template_id: "projects_template",
-  formspree_endpoint: "https://formspree.io/f/mykbowbn",
 };
 
 const SAVE_KEY = "website_brief_v2";
@@ -1311,12 +1309,11 @@ const TIPS = {
    HELPERS
 ───────────────────────────────────────── */
 function loadSaved() {
-  try {
-    const raw = localStorage.getItem(SAVE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
+  return loadDraft(SAVE_KEY, INITIAL_FORM);
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
 /* ─────────────────────────────────────────
@@ -1486,7 +1483,8 @@ function getVal(data, key) {
    Sent to the client's own address
 ───────────────────────────────────────── */
 function buildClientEmailHTML(data, senderEmail) {
-  const clientName = (data.A1_Business_Name || "").trim();
+  const clientName = escapeHtml((data.A1_Business_Name || "").trim());
+  senderEmail = escapeHtml(senderEmail);
   const date = new Date().toLocaleDateString("en-AU", {
     day: "numeric",
     month: "long",
@@ -1499,7 +1497,7 @@ function buildClientEmailHTML(data, senderEmail) {
         let val = "";
         if (f.isBool) {
           if (!data[f.key]) return "";
-          const priority = getVal(data, f.priorityKey);
+          const priority = escapeHtml(getVal(data, f.priorityKey));
           val = priority ? `Yes &nbsp;·&nbsp; Priority: ${priority}` : "Yes";
         } else {
           val = getVal(data, f.key);
@@ -1553,7 +1551,7 @@ function buildClientEmailHTML(data, senderEmail) {
           <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#b8962b;"> </p>
           <h1 style="margin:0 0 8px;font-size:26px;font-weight:700;color:#ffffff;line-height:1.25;">Your Website Brief</h1>
           ${clientName ? `<p style="margin:0 0 16px;font-size:17px;color:rgba(255,255,255,0.75);">${clientName}</p>` : ""}
-          <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);">Submitted ${date}${senderEmail ? " &nbsp;·&nbsp; " + senderEmail : ""}</p>
+          <p style="margin:0;font-size:13px;color:rgba(255,255,255,0.5);">Prepared ${date}${senderEmail ? " &nbsp;·&nbsp; " + senderEmail : ""}</p>
         </td></tr>
 
         <!-- Intro -->
@@ -1587,7 +1585,8 @@ function buildClientEmailHTML(data, senderEmail) {
    Sent to jarvis.pc13@gmail.com
 ───────────────────────────────────────── */
 function buildDeveloperEmailHTML(data, senderEmail) {
-  const clientName = (data.A1_Business_Name || "").trim();
+  const clientName = escapeHtml((data.A1_Business_Name || "").trim());
+  senderEmail = escapeHtml(senderEmail);
   const date = new Date().toLocaleDateString("en-AU", {
     day: "numeric",
     month: "long",
@@ -1787,6 +1786,7 @@ function calcCompletion(form) {
    CONFETTI (canvas)
 ───────────────────────────────────────── */
 function launchConfetti() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const canvas = document.createElement("canvas");
   canvas.style.cssText =
     "position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999;";
@@ -1878,9 +1878,9 @@ function TipPanel({ tipKey }) {
 function VisualAid({ visKey }) {
   const [popover, setPopover] = useState(false);
   const v = VISUALS[visKey];
+  const close = useCallback(() => setPopover(false), []);
+  useDialog(popover, close, '.va-popover');
   if (!v) return null;
-
-  const close = () => setPopover(false);
 
   // Close on Escape key
   useEffect(() => {
@@ -1899,7 +1899,7 @@ function VisualAid({ visKey }) {
         tabIndex={0}
         title="Click to enlarge"
         aria-label={`View infographic: ${v.caption}`}
-        onKeyDown={(e) => e.key === "Enter" && setPopover(true)}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setPopover(true); } }}
       >
         <div className="visual-aid-expand-hint">🔍 enlarge</div>
         <div className="visual-aid-svg-thumb">
@@ -2017,6 +2017,7 @@ function GoalRow({
           checked={checkValue}
           onChange={onCheck}
           title="Tick if relevant"
+          aria-label={`Include goal: ${label}`}
         />
       </div>
       <div className="goal-priority">
@@ -2028,6 +2029,7 @@ function GoalRow({
           placeholder="—"
           value={priorityValue}
           onChange={onPriority}
+          aria-label={`Priority for ${label}`}
         />
       </div>
     </div>
@@ -2070,7 +2072,6 @@ export default function Home() {
     return saved ? { ...INITIAL_FORM, ...saved } : INITIAL_FORM;
   });
   const [step, setStep] = useState(0); // 0 = intro, 1–8 = sections A–H
-  const [highestStep, setHighestStep] = useState(0); // furthest section visited
   const [visitedSteps, setVisitedSteps] = useState(new Set()); // steps the user has actually landed on
   const [animDir, setAnimDir] = useState("right"); // for slide direction
   const [saveStatus, setSaveStatus] = useState("saved");
@@ -2078,11 +2079,13 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const [submitterEmail, setSubmitterEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState({ message: "", visible: false });
   const saveTimer = useRef(null);
   const toastTimer = useRef(null);
-  const emailjsReady = useRef(false);
   const sectionRef = useRef(null);
+  const closeModal = useCallback(() => setModalOpen(false), []);
+  useDialog(modalOpen, closeModal, '.modal-overlay');
 
   // Returns true if the section (by letter id e.g. 'A') has any filled fields
   const sectionHasData = (sectionId) => {
@@ -2101,23 +2104,6 @@ export default function Home() {
     month: "long",
     year: "numeric",
   });
-
-  // Init EmailJS
-  useEffect(() => {
-    if (CONFIG.emailjs_public_key && !emailjsReady.current) {
-      const script = document.createElement("script");
-      script.src =
-        "https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js";
-      script.async = true;
-      script.onload = () => {
-        if (window.emailjs) {
-          window.emailjs.init({ publicKey: CONFIG.emailjs_public_key });
-          emailjsReady.current = true;
-        }
-      };
-      document.head.appendChild(script);
-    }
-  }, []);
 
   // Restore saved — show timestamp toast once
   useEffect(() => {
@@ -2149,7 +2135,7 @@ export default function Home() {
   const triggerAutoSave = useCallback((newForm) => {
     setSaveStatus("saving");
     clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => {
+    const persist = () => {
       try {
         const now = new Date();
         localStorage.setItem(SAVE_KEY, JSON.stringify(newForm));
@@ -2165,9 +2151,10 @@ export default function Home() {
         );
         setSaveStatus("saved");
       } catch {
-        /* ok */
+        setSaveStatus('error');
       }
-    }, 700);
+    };
+    persist();
   }, []);
 
   const handleChange = useCallback(
@@ -2208,7 +2195,6 @@ export default function Home() {
       }
       return newStep;
     });
-    setHighestStep((prev) => Math.max(prev, newStep));
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }, 50);
@@ -2229,47 +2215,14 @@ export default function Home() {
       )
     )
       return;
+    clearTimeout(saveTimer.current);
     setForm(INITIAL_FORM);
-    localStorage.removeItem(SAVE_KEY);
-    localStorage.removeItem(SAVE_KEY + "_meta");
+    try {
+      localStorage.removeItem(SAVE_KEY);
+      localStorage.removeItem(SAVE_KEY + "_meta");
+    } catch { showToast('Browser storage unavailable. Current answers cleared.'); }
     setSaveStatus("saved");
     showToast("All answers have been cleared.");
-  };
-
-  /* ── Send client copy via EmailJS ── */
-  const sendClientEmail = (toEmail) => {
-    if (!emailjsReady.current || !window.emailjs) return;
-    const clientName = (form.A1_Business_Name || "").trim();
-    const html = buildClientEmailHTML(form, toEmail);
-    window.emailjs
-      .send(CONFIG.emailjs_service_id, CONFIG.emailjs_template_id, {
-        to_email: toEmail,
-        to_name: clientName || "there",
-        developer_name: CONFIG.developerName,
-        subject: `Your website brief${clientName ? " — " + clientName : ""}`,
-        brief_text: html,
-      })
-      .then(() => {
-        showToast(`Your summary has been sent to ${toEmail}`);
-      })
-      .catch((err) => console.warn("EmailJS client send failed:", err));
-  };
-
-  /* ── Send developer copy via EmailJS ── */
-  const sendDeveloperEmail = () => {
-    if (!emailjsReady.current || !window.emailjs) return;
-    const clientName = (form.A1_Business_Name || "").trim();
-    const senderEmail = submitterEmail.trim();
-    const html = buildDeveloperEmailHTML(form, senderEmail);
-    window.emailjs
-      .send(CONFIG.emailjs_service_id, CONFIG.emailjs_template_id, {
-        to_email: "jarvis.pc13@gmail.com",
-        to_name: CONFIG.developerName,
-        developer_name: CONFIG.developerName,
-        subject: `[New Brief] ${clientName || "Website Brief"}${senderEmail ? " — " + senderEmail : ""}`,
-        brief_text: html,
-      })
-      .catch((err) => console.warn("EmailJS developer send failed:", err));
   };
 
   /* ── Branded in-browser summary window ── */
@@ -2287,12 +2240,8 @@ export default function Home() {
       existingWin ||
       window.open("", "_blank", "width=760,height=720,scrollbars=yes");
     if (!w) {
-      navigator.clipboard
-        ?.writeText(markdown)
-        .then(() => showToast("Answers copied to clipboard."))
-        .catch(() =>
-          showToast("Could not open a new window. Please allow pop-ups."),
-        );
+      downloadSummary(markdown);
+      showToast('Pop-up blocked. Complete summary downloaded instead.');
       return;
     }
 
@@ -2301,7 +2250,7 @@ export default function Home() {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Website Brief${clientName ? " — " + clientName : ""}</title>
+  <title>Website Brief${clientName ? " — " + escapeHtml(clientName) : ""}</title>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'Helvetica Neue',Arial,sans-serif;background:#f5f0e8;min-height:100vh;}
@@ -2384,7 +2333,15 @@ export default function Home() {
   };
 
   const handleSubmit = async () => {
+    if (submitting) return;
+    if (!document.getElementById('submitterEmail').reportValidity()) return;
     const email = submitterEmail.trim();
+    const questions = BRIEF_SECTIONS.flatMap(section => section.fields.map(field => ({
+      id: field.key, section: section.title, question: field.label,
+      answer: getVal(form, field.key) + (field.isBool && form[field.key] && getVal(form, field.priorityKey) ? ` (Priority: ${getVal(form, field.priorityKey)})` : ''),
+    })));
+    if (!questions.some(q => q.answer.trim())) { showToast('Write at least one answer before submitting.'); return; }
+    setSubmitting(true);
     setModalOpen(false);
 
     // Open summary window early so browser doesn't block it as a pop-up
@@ -2393,54 +2350,18 @@ export default function Home() {
       "_blank",
       "width=760,height=720,scrollbars=yes",
     );
-    if (summaryWin) {
-      summaryWin.document.write(
-        `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Preparing…</title></head><body style="font-family:sans-serif;padding:48px;background:#1b2b4b;color:rgba(255,255,255,0.7)"><p style="font-size:16px">Sending your answers — this window will update in a moment…</p></body></html>`,
-      );
-    }
-
-    const fd = new FormData();
+    openStyledSummaryWindow(email, summaryWin);
     const clientName = (form.A1_Business_Name || "").trim();
-    fd.append(
-      "_subject",
-      `Website Brief${clientName ? " — " + clientName : ""}`,
-    );
-    if (email) fd.append("_replyto", email);
-
-    Object.entries(form).forEach(([key, val]) => {
-      if (Array.isArray(val)) {
-        val.forEach((v) => fd.append(key, v));
-      } else if (typeof val === "boolean") {
-        if (val) fd.append(key, "Yes");
-      } else if (val) {
-        fd.append(key, val);
-      }
-    });
-    if (email) fd.append("Submitter_Email", email);
-
     try {
-      const res = await fetch(CONFIG.formspree_endpoint, {
-        method: "POST",
-        body: fd,
-        headers: { Accept: "application/json" },
+      await saveSubmission({
+        guideId: 'brief', title: clientName ? `Website Brief — ${clientName}` : 'Website Brief',
+        senderEmail: email, date: today, questions, summary: buildMarkdownBrief(form, email),
       });
-      if (res.ok) {
-        setSubmitted(true);
-        launchConfetti();
-        // 1. Styled in-browser summary window
-        openStyledSummaryWindow(email, summaryWin);
-        // 2. Styled HTML client email
-        if (email) sendClientEmail(email);
-        // 3. Developer email (styled HTML + Markdown block)
-        sendDeveloperEmail();
-      } else {
-        showToast("There was a problem sending. Please try printing instead.");
-        if (summaryWin && !summaryWin.closed) summaryWin.close();
-      }
-    } catch {
-      showToast("Could not connect. Please print your answers as a backup.");
-      if (summaryWin && !summaryWin.closed) summaryWin.close();
-    }
+      setSubmitted(true);
+      launchConfetti();
+    } catch (error) {
+      showToast(`${error.message} Your complete summary is available as a backup; answers remain here.`);
+    } finally { setSubmitting(false); }
   };
 
   /* ── Section content renderers ── */
@@ -3832,7 +3753,7 @@ export default function Home() {
             </div>
             <div className="site-header-text">
               <div className="brand">Prabesh Bhetwal · Client Briefing</div>
-              <div className="doc-title">Website Brief</div>
+            <h1 className="doc-title">Website Brief</h1>
               <div className="doc-meta">{today}</div>
             </div>
           </div>
@@ -3841,9 +3762,9 @@ export default function Home() {
           <span className="success-icon">🎉</span>
           <h2>Brief submitted successfully!</h2>
           <p>
-            Your web developer has received your answers and will be in touch
-            shortly. A copy of your answers has opened in a new window — print
-            it or save it as a PDF for your records.
+            Your answers are saved for the website team to review. Your complete
+            summary is available in a new window or downloaded text file — keep
+            it for your records. No email is sent automatically.
           </p>
           <p>
             Thank you for taking the time to complete this. The more detail
@@ -3862,6 +3783,7 @@ export default function Home() {
   const currentSectionIdx = step - 1; // 0-indexed within SECTIONS
   const currentSection = SECTIONS[currentSectionIdx];
   const isLastSection = step === SECTIONS.length;
+  const visitedCount = visitedSteps.size + (step >= 1 && !visitedSteps.has(step) ? 1 : 0);
 
   return (
     <div className={`home-shell${isIntro ? "" : " is-section"}`}>
@@ -3873,9 +3795,9 @@ export default function Home() {
           </div>
           <div className="site-header-text">
             <div className="brand">Prabesh Bhetwal · Client Briefing</div>
-            <div className="doc-title">
+            <h1 className="doc-title">
               Website Brief — What Do You Want From Your Website?
-            </div>
+            </h1>
             <div className="doc-meta">
               Complete this form and submit it, or print it to discuss in person
               · {today}
@@ -3904,7 +3826,7 @@ export default function Home() {
                     role="button"
                     aria-label={`Go to ${s.label}`}
                     tabIndex={0}
-                    onKeyDown={(e) => e.key === "Enter" && goToStep(sIdx, sIdx < step ? "left" : "right")}
+                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); goToStep(sIdx, sIdx < step ? 'left' : 'right'); } }}
                   >
                     <div
                       className="w-step-dot"
@@ -3968,6 +3890,7 @@ export default function Home() {
               <p>This form will help turn your ideas for your new website into a clear, practical plan. There are no wrong answers — the goal is simply to understand what you want, who it is for, and what it should achieve for your business.</p>
               <p>The form is split into <strong>8 short sections</strong>. Each section focuses on one aspect of your website. You can complete them in any order and take as many breaks as you like — your answers are <strong>automatically saved</strong> as you type.</p>
               <p>If any question is unclear, skip it and write your question in <strong><span style={{ whiteSpace: "nowrap" }}>Section 8 — Q &amp; A</span></strong> at the end. When you're finished, you can submit your answers directly or print a copy to discuss in person.</p>
+              <p><a href="/client-question-guide">Open general planning guide</a> · <a href="/bayview-question-guide">Open Bayview guide</a></p>
               <div style={{ marginTop: "18px" }}>
                 <div style={{
                   display: "grid",
@@ -4052,6 +3975,7 @@ export default function Home() {
                       className="btn-nav btn-nav-gold"
                       onClick={() => setModalOpen(true)}
                       title="Submit your answers"
+                      disabled={submitting}
                     >
                       Submit answers ✓
                     </button>
@@ -4079,7 +4003,7 @@ export default function Home() {
       {/* Only shown during the wizard (not on intro screen, not on last-section nav which has its own submit) */}
       {!isIntro &&
         (() => {
-          const allSectionsVisited = highestStep >= SECTIONS.length;
+          const allSectionsVisited = visitedCount >= SECTIONS.length;
           const BAR = {
             position: "fixed",
             bottom: 0,
@@ -4119,7 +4043,7 @@ export default function Home() {
           };
 
           return (
-            <div style={BAR}>
+            <div className="brief-action-bar" style={BAR}>
               {/* Save indicator — left side */}
               <div
                 style={{
@@ -4141,7 +4065,7 @@ export default function Home() {
                     flexShrink: 0,
                   }}
                 />
-                {saveStatus === "saving"
+                {submitting ? 'Saving submission…' : saveStatus === 'error' ? 'Draft not saved. Download a backup.' : saveStatus === "saving"
                   ? "Saving…"
                   : saveTime
                     ? `Saved ${saveTime}`
@@ -4152,7 +4076,7 @@ export default function Home() {
               <button type="button" onClick={clearAll} style={BTN}>
                 Clear all
               </button>
-              <button type="button" onClick={() => window.print()} style={BTN}>
+              <button type="button" onClick={() => openStyledSummaryWindow(submitterEmail)} style={BTN}>
                 Print / PDF
               </button>
 
@@ -4162,6 +4086,7 @@ export default function Home() {
                   type="button"
                   onClick={() => setModalOpen(true)}
                   style={BTN_GOLD}
+                  disabled={submitting}
                 >
                   Submit answers ✓
                 </button>
@@ -4178,8 +4103,8 @@ export default function Home() {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {SECTIONS.length - highestStep} section
-                  {SECTIONS.length - highestStep !== 1 ? "s" : ""} remaining
+                  {SECTIONS.length - visitedCount} section
+                  {SECTIONS.length - visitedCount !== 1 ? "s" : ""} remaining
                 </div>
               ) : null}
             </div>
@@ -4200,8 +4125,8 @@ export default function Home() {
           <div className="modal">
             <h2 id="modalHeading">Ready to submit your answers?</h2>
             <p>
-              Your completed brief will be sent directly to your web developer.
-              After submitting, a full summary will open automatically — print
+              Your completed brief will be saved for the website team to review.
+              A full summary will open automatically — print
               it, save it as a PDF, or copy it for your records.
             </p>
             <p>
@@ -4240,8 +4165,8 @@ export default function Home() {
               </button>
             </div>
             <p className="privacy-note">
-              Your answers are sent securely only to your developer. They are
-              not stored, shared, or used for any other purpose.
+              Drafts are saved in this browser. Submitted answers are stored in
+              the project database for authorised review. No email is sent automatically.
             </p>
           </div>
         </div>

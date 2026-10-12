@@ -4,7 +4,7 @@
 ================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
+.home-shell {
   --navy:        #1b2b4b;
   --navy-mid:    #243555;
   --navy-light:  #2e4070;
@@ -16,7 +16,7 @@
   --white:       #ffffff;
   --text:        #1a1a1a;
   --text-mid:    #464646;
-  --text-soft:   #767676;
+  --text-soft:   #626262;
   --border:      #dedad2;
   --border-dark: #c8c3b8;
   --success:     #2d7a4a;
@@ -38,7 +38,7 @@ html, body {
   overflow-x: hidden;
 }
 
-body {
+.home-shell {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: var(--bg);
   color: var(--text);
@@ -1740,4 +1740,24 @@ input:focus, textarea:focus {
   .goal-row { grid-template-columns: 1fr 40px 100px; }
   .modal { padding: 24px 20px; }
   .action-bar { padding: 10px 14px; gap: 7px; }
+}
+
+.brief-action-bar { flex-wrap: wrap; }
+.brief-action-bar > div:last-child { color: #68532b !important; }
+.home-shell .w-step:not(.active) .w-step-label { color: #555 !important; opacity: 1 !important; }
+.home-shell .tip-toggle, .home-shell .optional { color: #665020; background: #faf6ec; }
+.brief-action-bar button { min-height: 44px !important; }
+.home-shell button:disabled { opacity: .65; cursor: wait; }
+.home-shell :focus-visible { outline: 3px solid #1b6ca8; outline-offset: 3px; }
+
+@media (max-width: 720px) {
+  .brief-action-bar { padding: 8px 10px !important; }
+  .brief-action-bar > div { width: 100%; }
+  .brief-action-bar button { flex: 1; }
+  .container { padding-bottom: 170px; }
+}
+
+@media print { .brief-action-bar { display: none !important; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
