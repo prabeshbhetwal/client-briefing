@@ -54,6 +54,8 @@ Browser tests own isolated MongoDB/API/Vite processes, browser storage and dynam
 
 ## Hosting and privacy
 
+GitHub's `Readiness` workflow runs the same API/browser/build checks against a health-checked MongoDB 7 service. API and browser steps receive distinct, run-specific fixture database names. `TEST_MONGODB_URI` is accepted only with `CI=true`, a loopback host and a `client_briefing_test_` namespace; credentials and URI options are rejected. This test-only setting never changes application database configuration. Integration failures fail CI rather than being skipped. Pull requests test the exact head SHA; pushes to `main` repeat acceptance after merge.
+
 `npm run build` creates `frontend/dist`. Static preview alone cannot save submissions: deployed sites need `/api` routed to the backend, MongoDB, HTTPS, a server-only admin token and an explicit `FRONTEND_ORIGIN`. Use `HOST=0.0.0.0` only behind a configured host/proxy. Configure backup/retention and abuse controls before public intake. No hosting or deployment is included.
 
 Drafts stay in unencrypted browser local storage. Submitted answers remain in MongoDB for authorised review. No email is sent automatically; confirmation means database persistence, not developer notification. A timed-out request may have saved before its response was lost; avoid repeated submissions without checking admin review.

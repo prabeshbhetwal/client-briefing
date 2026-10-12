@@ -1,4 +1,4 @@
-"""Synthetic browser regression; owns every server and isolated MongoDB fixture."""
+"""Synthetic browser regression; owns app servers and uses isolated MongoDB fixtures."""
 import json
 import os
 from pathlib import Path
@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import time
 import urllib.request
+from urllib.parse import urlsplit
 from playwright.sync_api import sync_playwright, expect
 expect.set_options(timeout=20000)
 
@@ -17,6 +18,36 @@ AUDIT.mkdir(exist_ok=True)
 os.environ.setdefault('PLAYWRIGHT_BROWSERS_PATH', str(AUDIT / 'browsers'))
 TOKEN = 'synthetic-browser-admin-token-32-characters'
 AXE = ROOT / 'frontend/node_modules/axe-core/axe.min.js'
+
+
+def ci_database_uri(value, ci):
+    if not value:
+        return None
+    try:
+        uri = urlsplit(value)
+        valid = ci == 'true' and uri.scheme == 'mongodb' and uri.hostname in ('127.0.0.1', 'localhost')
+        valid = valid and uri.path.startswith('/client_briefing_test_') and len(uri.path) > len('/client_briefing_test_')
+        valid = valid and all(c.isascii() and (c.isalnum() or c in '_-') for c in uri.path[1:])
+        valid = valid and not (uri.username or uri.password or uri.query or uri.fragment)
+    except ValueError:
+        valid = False
+    if not valid:
+        raise ValueError('External test MongoDB requires CI, loopback and a named fixture database.')
+    return value
+
+
+fixture_uri = 'mongodb://127.0.0.1:27017/client_briefing_test_browser_guard'
+assert ci_database_uri(fixture_uri, 'true') == fixture_uri
+for unsafe_uri, ci in [(fixture_uri, 'false'), ('mongodb://127.0.0.1:27017/pb_client_briefing', 'true'),
+                       ('mongodb://example.invalid/client_briefing_test_browser_guard', 'true'),
+                       ('mongodb://test:fake@127.0.0.1:27017/client_briefing_test_browser_guard', 'true')]:
+    try:
+        ci_database_uri(unsafe_uri, ci)
+    except ValueError:
+        pass
+    else:
+        raise AssertionError('Unsafe CI fixture URI accepted')
+SERVICE_URI = ci_database_uri(os.environ.get('TEST_MONGODB_URI'), os.environ.get('CI'))
 
 
 def unused_port():
@@ -46,22 +77,23 @@ signal.signal(signal.SIGALRM, deadline)
 signal.alarm(300)
 try:
     mongo_port, api_port, web_port = unused_port(), unused_port(), unused_port()
-    dbpath = Path(tempfile.mkdtemp(prefix='browser-mongo-', dir=AUDIT))
     env = {**os.environ, 'PORT': str(api_port), 'HOST': '127.0.0.1', 'ADMIN_TOKEN': TOKEN,
-           'MONGODB_URI': f'mongodb://127.0.0.1:{mongo_port}/browser_test',
+           'MONGODB_URI': SERVICE_URI or f'mongodb://127.0.0.1:{mongo_port}/browser_test',
            'API_PROXY_TARGET': f'http://127.0.0.1:{api_port}'}
     commands = [
-        ['mongod', '--dbpath', str(dbpath), '--bind_ip', '127.0.0.1', '--port', str(mongo_port),
-         '--wiredTigerCacheSizeGB', '0.25', '--logpath', str(dbpath / 'mongod.log')],
         ['node', 'backend/index.js'],
         ['node', 'frontend/node_modules/vite/bin/vite.js', 'frontend', '--config', 'frontend/vite.config.js', '--port', str(web_port)],
     ]
+    if not SERVICE_URI:
+        dbpath = Path(tempfile.mkdtemp(prefix='browser-mongo-', dir=AUDIT))
+        commands.insert(0, ['mongod', '--dbpath', str(dbpath), '--bind_ip', '127.0.0.1', '--port', str(mongo_port),
+                            '--wiredTigerCacheSizeGB', '0.25', '--logpath', str(dbpath / 'mongod.log')])
     for index, command in enumerate(commands):
         log = open(AUDIT / f'browser-server-{index}.log', 'w')
         logs.append(log)
         child = subprocess.Popen(command, cwd=ROOT, env=env, stdout=log, stderr=log)
         children.append(child)
-        if index == 0:
+        if command[0] == 'mongod':
             for _ in range(100):
                 if child.poll() is not None:
                     raise RuntimeError('Isolated MongoDB exited. See .audit/browser-server-0.log.')
@@ -72,7 +104,7 @@ try:
                     time.sleep(.5)
             else:
                 raise RuntimeError('Isolated MongoDB startup timed out.')
-        elif index == 1:
+        elif command[1] == 'backend/index.js':
             wait_ready(api_port, child, '/api/health')
         else:
             wait_ready(web_port, child)

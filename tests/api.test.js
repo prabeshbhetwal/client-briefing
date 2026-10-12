@@ -9,6 +9,18 @@ import { app, Submission } from '../backend/app.js';
 import { loadDraft, saveSubmission } from '../frontend/src/submissions.js';
 
 let mongo, server, base, mongoUri;
+function ciDatabaseUri(value, ci) {
+  if (!value) return null;
+  let uri;
+  try { uri = new URL(value); } catch { throw new Error('Invalid isolated CI database URI.'); }
+  if (ci !== 'true' || uri.protocol !== 'mongodb:' || !['127.0.0.1', 'localhost'].includes(uri.hostname)
+    || !/^\/client_briefing_test_[a-z\d_-]+$/i.test(uri.pathname)
+    || uri.username || uri.password || uri.search || uri.hash) {
+    throw new Error('External test MongoDB requires CI, loopback and a named fixture database.');
+  }
+  return value;
+}
+const serviceUri = ciDatabaseUri(process.env.TEST_MONGODB_URI, process.env.CI);
 const token = 'synthetic-test-admin-token-32-characters';
 const payload = {
   guideId: 'brief', title: 'Synthetic test brief', senderEmail: 'test@example.invalid',
@@ -19,18 +31,23 @@ const payload = {
 before(async () => {
   process.env.ADMIN_TOKEN = token;
   await mkdir('.audit', { recursive: true });
-  const dbpath = await mkdtemp(`${process.cwd()}/.audit/api-mongo-`);
-  const socket = net.createServer();
-  socket.listen(0, '127.0.0.1');
-  await once(socket, 'listening');
-  const port = socket.address().port;
-  await new Promise(resolve => socket.close(resolve));
-  mongo = spawn('mongod', ['--dbpath', dbpath, '--bind_ip', '127.0.0.1', '--port', String(port), '--wiredTigerCacheSizeGB', '0.25', '--logpath', `${dbpath}/mongod.log`], { stdio: 'ignore' });
-  mongo.on('error', () => {});
-  mongoUri = `mongodb://127.0.0.1:${port}/briefing_test`;
-  for (let attempt = 0; ; attempt++) {
-    try { await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 300 }); break; }
-    catch { if (attempt === 150 || mongo.exitCode !== null) throw new Error('Isolated MongoDB could not start. Install mongod; no existing database is used.'); }
+  mongoUri = serviceUri;
+  if (serviceUri) {
+    await mongoose.connect(serviceUri, { serverSelectionTimeoutMS: 5000 });
+  } else {
+    const dbpath = await mkdtemp(`${process.cwd()}/.audit/api-mongo-`);
+    const socket = net.createServer();
+    socket.listen(0, '127.0.0.1');
+    await once(socket, 'listening');
+    const port = socket.address().port;
+    await new Promise(resolve => socket.close(resolve));
+    mongo = spawn('mongod', ['--dbpath', dbpath, '--bind_ip', '127.0.0.1', '--port', String(port), '--wiredTigerCacheSizeGB', '0.25', '--logpath', `${dbpath}/mongod.log`], { stdio: 'ignore' });
+    mongo.on('error', () => {});
+    mongoUri = `mongodb://127.0.0.1:${port}/briefing_test`;
+    for (let attempt = 0; ; attempt++) {
+      try { await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 300 }); break; }
+      catch { if (attempt === 150 || mongo.exitCode !== null) throw new Error('Isolated MongoDB could not start. Install mongod; no existing database is used.'); }
+    }
   }
   server = app.listen(0, '127.0.0.1');
   await once(server, 'listening');
@@ -46,6 +63,16 @@ after(async () => {
 function post(body, headers = { 'Content-Type': 'application/json' }) {
   return fetch(`${base}/api/submissions`, { method: 'POST', headers, body: JSON.stringify(body) });
 }
+
+test('CI fixture guard rejects application databases, remote hosts and credentials', () => {
+  const fixture = 'mongodb://127.0.0.1:27017/client_briefing_test_api_123';
+  assert.equal(ciDatabaseUri(fixture, 'true'), fixture);
+  for (const [uri, ci] of [[fixture, 'false'], ['mongodb://127.0.0.1:27017/pb_client_briefing', 'true'],
+    ['mongodb://example.invalid/client_briefing_test_api_123', 'true'],
+    ['mongodb://test:fake@127.0.0.1:27017/client_briefing_test_api_123', 'true']]) {
+    assert.throws(() => ciDatabaseUri(uri, ci), /requires CI/);
+  }
+});
 
 test('health reflects connected database', async () => {
   const response = await fetch(`${base}/api/health`);
