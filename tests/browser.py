@@ -205,6 +205,24 @@ try:
                 expect(page.locator('.gif-lightbox')).to_be_visible()
                 page.keyboard.press('Escape')
                 expect(visual).to_be_focused()
+                measurements = []
+                for width in (320, 375):
+                    page.set_viewport_size({'width': width, 'height': 812})
+                    measurements.append(page.locator('#brief-summary').evaluate("""panel => {
+                      const grid = panel.querySelector('.intro-grid');
+                      const table = panel.querySelector('table');
+                      const box = el => { const r=el.getBoundingClientRect(); return {left:r.left,right:r.right,width:r.width}; };
+                      const text = [...table.querySelectorAll('th,td')].flatMap(cell => {
+                        const range=document.createRange(); range.selectNodeContents(cell);
+                        return [...range.getClientRects()].map(r => ({left:r.left,right:r.right}));
+                      });
+                      return {viewport:innerWidth, panel:box(panel), grid:box(grid),
+                        columns:getComputedStyle(grid).gridTemplateColumns, firstChild:box(grid.firstElementChild),
+                        table:box(table), textLeft:Math.min(...text.map(r=>r.left)), textRight:Math.max(...text.map(r=>r.right))};
+                    }"""))
+                print('BAYVIEW_GEOMETRY:', json.dumps(measurements), flush=True)
+                assert all(m['table']['left'] >= 0 and m['textRight'] <= m['viewport'] + 1 for m in measurements), 'Brief confirmation text clips outside mobile viewport'
+                page.set_viewport_size({'width': 1280, 'height': 900})
             audit(f'{label}-desktop')
             page.screenshot(path=str(AUDIT / f'{label}-desktop-viewport.png'))
             page.screenshot(path=str(AUDIT / f'{label}-desktop.png'), full_page=True)
