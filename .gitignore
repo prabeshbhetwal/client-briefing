@@ -38,4 +38,9 @@ legacy_files
 _trash
 .claude
 .code-review-graph
+.audit/
+.audit-venv/
+.local-data/
+__pycache__/
+.fallow/
 

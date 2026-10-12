@@ -20,7 +20,8 @@ The workspace is divided into two main directories:
 ## Features
 
 - **Interactive Question Guides**: Specific routing for different clients.
-- **Database Submissions**: Submissions are stored securely in a MongoDB database instead of relying on third-party email form handlers.
+- **Database Submissions**: All three forms save validated answers in MongoDB. No email is sent automatically. `/admin` reviews saved briefs using a server-only token.
+- **Recovery**: Browser drafts, complete printable summaries and text downloads when pop-ups are blocked. Failed saves retain answers.
 - **Modern UI**: React-based components for a responsive and dynamic user experience.
 - **Concurrent Development**: Single command to run both frontend and backend development servers concurrently.
 
@@ -28,17 +29,19 @@ The workspace is divided into two main directories:
 
 ### Prerequisites
 
-- Node.js (v18+)
+- Node.js (v22+)
 - npm
 - MongoDB (Local instance or MongoDB Atlas URI)
 
 ### 1. Environment Variables
 
-Create a `.env` file in the `backend/` directory:
+Copy `backend/.env.example` to `backend/.env` without replacing an existing file. Keep credentials server-side. Defaults:
 
 ```env
-PORT=
-MONGODB_URI=mongodb://localhost:YOUR_MONGO_PORT/YOUR_DATABASE || Or put your MongoDB Atlas URI
+PORT=5001
+HOST=127.0.0.1
+MONGODB_URI=mongodb://127.0.0.1:27017/pb_client_briefing
+ADMIN_TOKEN=
 ```
 
 ### 2. Installation
@@ -46,11 +49,8 @@ MONGODB_URI=mongodb://localhost:YOUR_MONGO_PORT/YOUR_DATABASE || Or put your Mon
 Install dependencies for both the frontend and backend:
 
 ```bash
-cd frontend
-npm install
-cd ../backend
-npm install
-cd ..
+npm ci --prefix frontend
+npm ci --prefix backend
 ```
 
 ### 3. Running the App
@@ -63,9 +63,11 @@ npm run dev
 
 This will concurrently run:
 
-- Frontend Vite development server
-- Backend Express development server
+- Frontend: `http://127.0.0.1:5173`.
+- Backend: `http://127.0.0.1:5001/api/health`; MongoDB must already be running.
+
+See [Local setup, stop, testing and hosting boundaries](docs/local-setup.md) for reproducible commands and data/privacy limitations. Run `npm test` and `npm run build` from the repository root.
 
 ## Legacy Code
 
-The original static `index.html` and vanilla JS files have been moved to `legacy_files/` and `_trash/`, and are no longer actively maintained or tracked by Git.
+`legacy_files/` and `_trash/` are ignored, if present. Supported application lives in `frontend/` and `backend/`.

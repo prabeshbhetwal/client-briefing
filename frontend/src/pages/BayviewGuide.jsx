@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { saveSubmission, openSummary, loadDraft } from '../submissions';
+import useDialog from '../useDialog';
 import '../index.css';
 import { GIF_URIS } from '../gifUris';
 
@@ -27,15 +29,6 @@ const BTN_PRIMARY = {
 const GUIDE_CONFIG = {
   guideId: 'bayview',
   developerName: 'Prabesh Bhetwal',
-  formspreeEndpoint: 'https://formspree.io/f/mykbowbn',
-  emailjs_public_key: 'fKgFK2YwaZ4q2H_8R',
-  emailjs_service_id: 'personalprojects',
-  emailjs_template_id: 'projects_template',
-  // Answers go to both Navin and the developer
-  send_to: [
-    { email: 'navin.upreti@outlook.com', name: 'Navin' },
-    { email: 'jarvis.pc13@gmail.com', name: 'Prabesh' },
-  ],
 };
 const STORAGE_KEY = 'question_guide_progress_bayview';
 
@@ -529,8 +522,9 @@ const SECTIONS = [
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 function loadPersistedState() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
-  catch { return {}; }
+  return loadDraft(STORAGE_KEY, Object.fromEntries(SECTIONS.flatMap(s => s.questions.flatMap(q => [
+    ['answer_' + q.id, ''], [q.id, false],
+  ]))));
 }
 
 function escHtml(v) {
@@ -605,12 +599,14 @@ function buildHtmlSummary(answers, checked, textSummary, submitterEmail) {
     return `<div class="brief-row"><span class="brief-label">${escHtml(label)}</span><span class="brief-val">${escHtml(v)}</span></div>`;
   }).join('');
 
-  return `<!doctype html><html><head><meta charset="UTF-8"><title>Bayview Corp — Website Guide Answers</title><style>${css}</style></head><body><main><h1>Bayview Corp — Website Planning Answers</h1><p>Submitted ${escHtml(date)}${submitterEmail ? ' by ' + escHtml(submitterEmail) : ''}.</p><div class="grid"><div class="metric"><strong>Answered</strong><span>${answeredCount} of ${allQ.length} questions</span></div><div class="metric"><strong>Critical gaps remaining</strong><span>${criticalMissing} critical question${criticalMissing !== 1 ? 's' : ''} still missing</span></div><div class="metric"><strong>Reference site</strong><span>pierceproperty.com.au</span></div></div><div class="toolbar"><button class="btn primary" onclick="window.print()">Print / Save as PDF</button><button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('plain').innerText)">Copy full text</button></div><h2>What the brief already confirmed</h2><div class="brief-panel"><h3>Existing brief answers</h3>${briefRows}</div><h2>Guide answers by section</h2><table><thead><tr><th>Section</th><th>Priority</th><th>Brief status</th><th>Question</th><th>Answer</th></tr></thead><tbody>${rows}</tbody></table><pre id="plain" style="white-space:pre-wrap;display:none">${escHtml(textSummary)}</pre></main></body></html>`;
+  return `<!doctype html><html><head><meta charset="UTF-8"><title>Bayview Corp — Website Guide Answers</title><style>${css}</style></head><body><main><h1>Bayview Corp — Website Planning Answers</h1><p>Prepared ${escHtml(date)}${submitterEmail ? ' by ' + escHtml(submitterEmail) : ''}.</p><div class="grid"><div class="metric"><strong>Answered</strong><span>${answeredCount} of ${allQ.length} questions</span></div><div class="metric"><strong>Critical gaps remaining</strong><span>${criticalMissing} critical question${criticalMissing !== 1 ? 's' : ''} still missing</span></div><div class="metric"><strong>Reference site</strong><span>pierceproperty.com.au</span></div></div><div class="toolbar"><button class="btn primary" onclick="window.print()">Print / Save as PDF</button><button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('plain').innerText)">Copy full text</button></div><h2>What the brief already confirmed</h2><div class="brief-panel"><h3>Existing brief answers</h3>${briefRows}</div><h2>Guide answers by section</h2><table><thead><tr><th>Section</th><th>Priority</th><th>Brief status</th><th>Question</th><th>Answer</th></tr></thead><tbody>${rows}</tbody></table><pre id="plain" style="white-space:pre-wrap;display:none">${escHtml(textSummary)}</pre></main></body></html>`;
 }
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 function GifCard({ gif }) {
   const [lightbox, setLightbox] = useState(false);
+  const close = useCallback(() => setLightbox(false), []);
+  useDialog(lightbox, close, '.gif-lightbox');
   return (
     <>
       <figure
@@ -619,7 +615,7 @@ function GifCard({ gif }) {
         style={{ cursor: 'pointer', position: 'relative' }}
         role="button"
         tabIndex={0}
-        onKeyDown={e => e.key === 'Enter' && setLightbox(true)}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setLightbox(true); } }}
         aria-label={'Enlarge: ' + gif.label}
       >
         <div style={{ position: 'absolute', top: 6, right: 8, fontSize: '11px', color: '#b8a060', opacity: 0, transition: 'opacity 0.18s' }} className="gif-expand-hint">🔍 Enlarge</div>
@@ -629,6 +625,7 @@ function GifCard({ gif }) {
       </figure>
       {lightbox && (
         <div
+          className="gif-lightbox" role="dialog" aria-modal="true" aria-label={'Enlarged example: ' + gif.label}
           onClick={() => setLightbox(false)}
           style={{
             position: 'fixed', inset: 0, zIndex: 9000, background: 'rgba(5,10,20,0.9)',
@@ -675,6 +672,7 @@ function VisualAid({ questionId }) {
         ))}
       </div>
       <div className="mini-chart">
+        <p>Illustrative comparisons; percentages are examples, not measured results.</p>
         {v.chart.map(([label, pct], i) => (
           <div key={i} className="mini-chart-row">
             <span>{label}</span>
@@ -718,6 +716,7 @@ function QuestionCard({ question, answer, checked, onAnswerChange, onCheckedChan
         className="question-check"
         id={question.id}
         type="checkbox"
+        aria-label={`Mark answered: ${question.heading}`}
         checked={!!checked}
         onChange={e => onCheckedChange(question.id, e.target.checked)}
       />
@@ -825,22 +824,26 @@ export default function BayviewGuide() {
   const [submitterEmail, setSubmitterEmail] = useState('');
   const [submitStatus, setSubmitStatus] = useState('Answers are saved in this browser as you type.');
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [visualsHidden, setVisualsHidden] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const toastTimer = useRef(null);
-  const emailjsReady = useRef(false);
   const saveTimer = useRef(null);
+  const closeModal = useCallback(() => setModalOpen(false), []);
+  useDialog(modalOpen, closeModal, '.guide-modal-overlay');
 
   // ── Persist to localStorage with debounce + timestamp ───────────────────
   useEffect(() => {
     clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => {
+    const persist = () => {
       try {
         const s = {};
         Object.assign(s, answers);
         Object.keys(checked).forEach(id => { if (checked[id]) s[id] = true; });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
         localStorage.setItem(STORAGE_KEY + '_meta', JSON.stringify({ savedAt: new Date().toISOString() }));
-      } catch { /* quota */ }
-    }, 400);
+      } catch { setSubmitStatus('Browser storage unavailable. Download a summary before leaving.'); }
+    };
+    persist();
   }, [answers, checked]);
 
   // ── Restore toast on mount ───────────────────────────────────────────────
@@ -857,29 +860,6 @@ export default function BayviewGuide() {
       setTimeout(() => setToast(''), 4200);
     } catch { /* ok */ }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // ── Load EmailJS ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (typeof window.emailjs !== 'undefined') {
-      if (!emailjsReady.current) {
-        window.emailjs.init({ publicKey: GUIDE_CONFIG.emailjs_public_key });
-        emailjsReady.current = true;
-      }
-      return;
-    }
-    if (document.querySelector('script[data-guide-emailjs]')) return;
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-    s.async = true;
-    s.dataset.guideEmailjs = 'true';
-    s.onload = () => {
-      if (window.emailjs && !emailjsReady.current) {
-        window.emailjs.init({ publicKey: GUIDE_CONFIG.emailjs_public_key });
-        emailjsReady.current = true;
-      }
-    };
-    document.head.appendChild(s);
   }, []);
 
   // ── Scroll + nav ─────────────────────────────────────────────────────────
@@ -917,8 +897,9 @@ export default function BayviewGuide() {
 
   // ── Handlers ─────────────────────────────────────────────────────────────
   function handleAnswerChange(qId, value) {
+    setSubmitted(false);
     setAnswers(prev => ({ ...prev, ['answer_' + qId]: value }));
-    if (value.trim()) setChecked(prev => ({ ...prev, [qId]: true }));
+    setChecked(prev => ({ ...prev, [qId]: !!value.trim() }));
   }
 
   function handleCheckedChange(qId, val) {
@@ -942,87 +923,41 @@ export default function BayviewGuide() {
   }
 
   function resetProgress() {
+    if (!window.confirm('Clear all answers in this guide?')) return;
+    clearTimeout(saveTimer.current);
     setAnswers({});
     setChecked({});
-    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ok */ }
+    setSubmitted(false);
+    try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(STORAGE_KEY + '_meta'); } catch { /* ok */ }
     showToast('Progress reset.');
   }
 
-  // ── Submit — sends to both Navin and Prabesh ─────────────────────────────
+  // Save the guide; prepare the complete backup before the network request.
   async function handleSubmit() {
+    if (submitting || !document.getElementById('guideSubmitterEmail').reportValidity()) return;
+    const questions = SECTIONS.flatMap(section => section.questions.map(q => ({
+      id: q.id, section: section.heading, question: q.heading, answer: answers['answer_' + q.id]?.trim() || '',
+    })));
+    if (!questions.some(q => q.answer)) { showToast('Write at least one answer before submitting.'); return; }
     const textSummary = buildTextSummary(answers, checked, submitterEmail);
     const htmlContent = buildHtmlSummary(answers, checked, textSummary, submitterEmail);
-
-    // Open summary window synchronously
-    const summaryWin = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
-    if (summaryWin) {
-      summaryWin.document.write(`<!doctype html><html><head><meta charset="UTF-8"><title>Preparing Bayview summary…</title></head><body style="font-family:sans-serif;padding:40px;color:#555">Preparing your detailed Bayview Corp summary…</body></html>`);
-    }
-
+    const backup = openSummary(htmlContent, textSummary);
+    setSubmitted(false);
+    setSubmitting(true);
     setModalOpen(false);
-    setSubmitStatus('Sending answers…');
-
-    const formData = new FormData();
-    formData.append('_subject', 'Bayview Corp — Website Planning Guide Answers');
-    if (submitterEmail) formData.append('_replyto', submitterEmail);
-    formData.append('guide_title', 'Bayview Corp Website Planning Guide');
-    formData.append('submitted_by', submitterEmail || '(not provided)');
-    formData.append('summary', textSummary);
-    SECTIONS.forEach(section => {
-      section.questions.forEach((q, i) => {
-        formData.append('Question_' + (i + 1), q.heading);
-        formData.append('Answer_' + (i + 1), answers['answer_' + q.id]?.trim() || '[Not answered]');
-        formData.append('Brief_status_' + (i + 1), q.briefStatus);
-      });
-    });
-
+    setSubmitStatus('Saving answers…');
     try {
-      const res = await fetch(GUIDE_CONFIG.formspreeEndpoint, {
-        method: 'POST',
-        body: formData,
-        headers: { Accept: 'application/json' },
+      await saveSubmission({
+        guideId: 'bayview', title: 'Bayview Website Planning Guide', senderEmail: submitterEmail.trim(),
+        date: new Date().toLocaleDateString('en-AU'), questions, summary: textSummary,
       });
-      if (!res.ok) throw new Error('Formspree failed');
-
-      // Write HTML to popup
-      if (summaryWin) {
-        summaryWin.document.open();
-        summaryWin.document.write(htmlContent);
-        summaryWin.document.close();
-      }
-
-      // EmailJS — send to BOTH recipients
-      if (emailjsReady.current && window.emailjs) {
-        const sends = GUIDE_CONFIG.send_to.map(recipient =>
-          window.emailjs.send(
-            GUIDE_CONFIG.emailjs_service_id,
-            GUIDE_CONFIG.emailjs_template_id,
-            {
-              to_email: recipient.email,
-              to_name: recipient.name,
-              developer_name: GUIDE_CONFIG.developerName,
-              brief_text: textSummary,
-              subject: 'Bayview Corp — Website Planning Guide Answers',
-            }
-          )
-        );
-        Promise.all(sends)
-          .then(() => showToast('Answers sent to Navin and the developer.'))
-          .catch(err => console.warn('EmailJS send failed:', err));
-      }
-
       setSubmitted(true);
-      setSubmitStatus('Submitted. A printable summary has opened in a new window.');
+      setSubmitStatus(`Answers saved. ${backup}`);
       showToast('Answers submitted successfully.');
-    } catch {
-      if (summaryWin) {
-        summaryWin.document.open();
-        summaryWin.document.write(htmlContent);
-        summaryWin.document.close();
-      }
-      setSubmitStatus('Submission failed. Your printable summary is open — copy or save it as a backup.');
-      showToast('Could not submit. Use the summary window as a backup.');
-    }
+    } catch (error) {
+      setSubmitStatus(`Submission not confirmed. ${error.message} ${backup} Keep your backup and retry.`);
+      showToast('Submission failed. Your answers remain here.');
+    } finally { setSubmitting(false); }
   }
 
   // ── Nav ───────────────────────────────────────────────────────────────────
@@ -1044,7 +979,7 @@ export default function BayviewGuide() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <>
+    <div className={visualsHidden ? 'bayview-guide hide-animated-examples' : 'bayview-guide'}>
       <div className="top-progress" aria-hidden="true">
         <span style={{ width: scrollPct + '%' }} />
       </div>
@@ -1097,6 +1032,7 @@ export default function BayviewGuide() {
             ))}
             <button type="button" onClick={expandAll}>Expand all</button>
             <button type="button" onClick={collapseAll}>Collapse all</button>
+            <button type="button" aria-pressed={visualsHidden} onClick={() => setVisualsHidden(!visualsHidden)}>{visualsHidden ? 'Show animated examples' : 'Hide animated examples'}</button>
             <button type="button" onClick={resetProgress}>Reset progress</button>
           </nav>
         </aside>
@@ -1105,7 +1041,7 @@ export default function BayviewGuide() {
           {submitted && (
             <div className="guide-success" style={{ display: 'block' }}>
               <h2>Answers submitted successfully</h2>
-              <p>Your completed guide has been sent to Navin and to the developer. A printable summary has opened in a new window.</p>
+              <p>Your completed guide is saved for authorised review. Keep the printable or downloaded summary. No email is sent automatically.</p>
             </div>
           )}
 
@@ -1254,7 +1190,7 @@ export default function BayviewGuide() {
       </main>
 
       {/* Sticky action bar */}
-      <div style={{
+      <div className="guide-action-bar" style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
         display: 'flex', alignItems: 'center', gap: '10px',
         padding: '12px 24px',
@@ -1263,24 +1199,24 @@ export default function BayviewGuide() {
         backdropFilter: 'blur(14px)',
         boxShadow: '0 -6px 28px rgba(24,32,43,0.14)',
       }}>
-        <div style={{ marginRight: 'auto', color: '#5f6570', fontSize: '13px' }}>{submitStatus}</div>
+        <div className="guide-action-status" role="status" style={{ marginRight: 'auto', color: '#5f6570', fontSize: '13px' }}>{submitStatus}</div>
         <button type="button" onClick={resetProgress} style={BTN}>Clear answers</button>
-        <button type="button" onClick={() => window.print()} style={BTN}>Print / Save PDF</button>
-        <button type="button" onClick={() => setModalOpen(true)} style={BTN_PRIMARY}>Submit answers</button>
+        <button type="button" onClick={() => openSummary(buildHtmlSummary(answers, checked, buildTextSummary(answers, checked, submitterEmail), submitterEmail), buildTextSummary(answers, checked, submitterEmail))} style={BTN}>Print / Save PDF</button>
+        <button type="button" disabled={submitting} onClick={() => setModalOpen(true)} style={BTN_PRIMARY}>Submit answers</button>
       </div>
 
       {/* Submit modal */}
       {modalOpen && (
-        <div className="guide-modal-overlay open" role="dialog" aria-modal="true" onClick={e => { if (e.target === e.currentTarget) setModalOpen(false); }}>
+        <div className="guide-modal-overlay open" role="dialog" aria-modal="true" aria-labelledby="guide-submit-heading" onClick={e => { if (e.target === e.currentTarget) setModalOpen(false); }}>
           <div className="guide-modal">
-            <h2>Ready to submit?</h2>
+            <h2 id="guide-submit-heading">Ready to submit?</h2>
             <p>
-              Your answers will be compiled into a detailed Bayview website planning summary and sent to
-              both <strong>Navin Upreti</strong> and the developer. A printable version will open in a new window for your own records.
+              Your answers will be saved for authorised review. A printable or downloaded
+              Bayview website planning summary is available for your records.
             </p>
             <label htmlFor="guideSubmitterEmail">
               Your email address{' '}
-              <span style={{ fontWeight: 400, color: '#5f6570' }}>(optional — to receive a copy yourself)</span>
+              <span style={{ fontWeight: 400, color: '#5f6570' }}>(optional — for follow-up)</span>
             </label>
             <input
               type="email"
@@ -1288,15 +1224,14 @@ export default function BayviewGuide() {
               placeholder="yourname@email.com"
               value={submitterEmail}
               onChange={e => setSubmitterEmail(e.target.value)}
-              autoFocus
             />
             <div className="guide-modal-actions">
               <button type="button" className="submit-action" onClick={handleSubmit}>Send my answers</button>
               <button type="button" onClick={() => setModalOpen(false)}>Go back and check</button>
             </div>
             <p className="privacy-note">
-              Answers go to Navin Upreti (navin.upreti@outlook.com) and the developer (jarvis.pc13@gmail.com).
-              Only submit information you are comfortable sharing.
+              Drafts stay in this browser; submitted answers are stored in the project database.
+              No email is sent automatically.
             </p>
           </div>
         </div>
@@ -1331,6 +1266,6 @@ export default function BayviewGuide() {
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes pop { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
       `}</style>
-    </>
+    </div>
   );
 }

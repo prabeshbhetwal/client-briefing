@@ -1027,5 +1027,30 @@ h1 {
   *::after {
     scroll-behavior: auto !important;
     transition: none !important;
+    animation: none !important;
   }
 }
+
+body:has(.guide-action-bar) { padding-bottom: 130px; }
+.guide-action-bar { flex-wrap: wrap; }
+.section-toggle .section-kicker { color: #72531e; }
+.hide-animated-examples .visual-card img { display: none; }
+.guide-action-bar button { width: auto; min-height: 44px !important; }
+.guide-action-status { width: 100%; margin-right: 0 !important; }
+button:disabled { opacity: .65; cursor: wait; }
+:focus-visible { outline: 3px solid #245f94; outline-offset: 3px; }
+.admin-page { max-width: 960px; margin: 0 auto; padding: 32px 20px; }
+.admin-page h1 { margin: 24px 0 12px; }
+.admin-page form { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
+.admin-page label { width: 100%; }
+.admin-page input { flex: 1; min-width: 180px; padding: 10px; }
+.admin-page button { min-height: 44px; padding: 8px 16px; }
+.admin-page details { margin: 16px 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; }
+.admin-page summary { cursor: pointer; }
+.admin-page pre { white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 16px; }
+@media (max-width: 720px) {
+  .guide-action-bar { padding: 10px 12px !important; gap: 6px !important; }
+  .guide-action-bar button { flex: 1 1 auto; padding: 8px 10px !important; font-size: 12px !important; }
+  body:has(.guide-action-bar) { padding-bottom: 190px; }
+}
+@media print { .guide-action-bar, .guide-modal-overlay, .guide-nav, .top-progress, .toast { display: none !important; } }

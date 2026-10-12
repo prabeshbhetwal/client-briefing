@@ -1,8 +1,13 @@
 {
   "name": "pb-client-briefing",
   "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
   "scripts": {
-    "dev": "npm run dev --prefix frontend & npm run dev --prefix backend",
-    "start": "npm run dev"
+    "dev": "node scripts/dev.js",
+    "start": "npm run dev",
+    "build": "npm run build --prefix frontend",
+    "test": "node --test --test-concurrency=1 tests/api.test.js",
+    "test:browser": ".audit-venv/bin/python tests/browser.py"
   }
 }

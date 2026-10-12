@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { saveSubmission, openSummary, loadDraft } from '../submissions';
+import useDialog from '../useDialog';
 import '../index.css';
 
 // ── Action bar button styles (inline — immune to CSS specificity/caching) ─────
@@ -26,10 +28,6 @@ const BTN_PRIMARY = {
 const GUIDE_CONFIG = {
   guideId: 'general',
   developerName: 'Prabesh Bhetwal',
-  formspreeEndpoint: 'https://formspree.io/f/mykbowbn',
-  emailjs_public_key: 'fKgFK2YwaZ4q2H_8R',
-  emailjs_service_id: 'personalprojects',
-  emailjs_template_id: 'projects_template',
 };
 const STORAGE_KEY = 'question_guide_progress_' + GUIDE_CONFIG.guideId;
 
@@ -253,8 +251,9 @@ const SECTIONS = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function loadPersistedState() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
-  catch { return {}; }
+  return loadDraft(STORAGE_KEY, Object.fromEntries(SECTIONS.flatMap(s => s.questions.flatMap(q => [
+    ['answer_' + q.id, ''], [q.id, false],
+  ]))));
 }
 
 function escHtml(v) {
@@ -298,7 +297,7 @@ function buildHtmlSummary(answers, checked, textSummary) {
 
   const css = `body{font-family:Inter,-apple-system,sans-serif;margin:0;background:#f7f2e8;color:#18202b;line-height:1.55}main{max-width:1120px;margin:0 auto;padding:34px 24px 80px}h1{font-family:Georgia,serif;font-size:38px;line-height:1.1;margin:0 0 10px}h2{font-family:Georgia,serif;font-size:26px;margin:34px 0 12px}p{color:#5f6570}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}.metric{border:1px solid #ded3bd;background:#fffdf7;border-radius:8px;padding:16px}.metric strong{display:block;color:#183452}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0}.btn{padding:9px 13px;border:1px solid #ded3bd;border-radius:8px;background:#fff;cursor:pointer}.btn.primary{background:#f1d491;border-color:#f1d491}table{width:100%;border-collapse:collapse;background:white;border:1px solid #ded3bd;border-radius:8px;overflow:hidden}th,td{padding:12px;border-bottom:1px solid #ded3bd;text-align:left;vertical-align:top}th{background:#183452;color:white;font-size:12px;text-transform:uppercase;letter-spacing:.06em}td span{display:block;color:#5f6570;font-size:13px;margin-top:4px}@media(max-width:760px){.grid{grid-template-columns:1fr}table{display:block;overflow-x:auto}}@media print{.toolbar{display:none}}`;
 
-  return `<!doctype html><html><head><meta charset="UTF-8"><title>Website Planning Guide</title><style>${css}</style></head><body><main><h1>Website Planning Guide</h1><p>Submitted ${escHtml(date)}.</p><div class="grid"><div class="metric"><strong>Progress</strong><span>${answeredCount} of ${allQ.length} answered</span></div><div class="metric"><strong>Guide type</strong><span>General client planning guide</span></div><div class="metric"><strong>Next step</strong><span>Review answers and confirm scope</span></div></div><div class="toolbar"><button class="btn primary" onclick="window.print()">Print / Save as PDF</button><button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('plain').innerText)">Copy full text</button></div><h2>Answered Questions</h2><table><thead><tr><th>Section</th><th>Priority</th><th>Question</th><th>Answer</th></tr></thead><tbody>${rows}</tbody></table><pre id="plain" style="white-space:pre-wrap;display:none">${escHtml(textSummary)}</pre></main></body></html>`;
+  return `<!doctype html><html><head><meta charset="UTF-8"><title>Website Planning Guide</title><style>${css}</style></head><body><main><h1>Website Planning Guide</h1><p>Prepared ${escHtml(date)}.</p><div class="grid"><div class="metric"><strong>Progress</strong><span>${answeredCount} of ${allQ.length} answered</span></div><div class="metric"><strong>Guide type</strong><span>General client planning guide</span></div><div class="metric"><strong>Next step</strong><span>Review answers and confirm scope</span></div></div><div class="toolbar"><button class="btn primary" onclick="window.print()">Print / Save as PDF</button><button class="btn" onclick="navigator.clipboard.writeText(document.getElementById('plain').innerText)">Copy full text</button></div><h2>Answered Questions</h2><table><thead><tr><th>Section</th><th>Priority</th><th>Question</th><th>Answer</th></tr></thead><tbody>${rows}</tbody></table><pre id="plain" style="white-space:pre-wrap;display:none">${escHtml(textSummary)}</pre></main></body></html>`;
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -319,6 +318,7 @@ function VisualAid({ questionId }) {
         ))}
       </div>
       <div className="mini-chart">
+        <p>Illustrative comparisons; percentages are examples, not measured results.</p>
         {v.chart.map(([label, pct], i) => (
           <div key={i} className="mini-chart-row">
             <span>{label}</span>
@@ -348,6 +348,7 @@ function QuestionCard({ question, answer, checked, onAnswerChange, onCheckedChan
         className="question-check"
         id={question.id}
         type="checkbox"
+        aria-label={`Mark answered: ${question.heading}`}
         checked={!!checked}
         onChange={e => onCheckedChange(question.id, e.target.checked)}
       />
@@ -435,22 +436,25 @@ export default function ClientGuide() {
   const [submitterEmail, setSubmitterEmail] = useState('');
   const [submitStatus, setSubmitStatus] = useState('Answers are saved in this browser as you type.');
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const toastTimer = useRef(null);
-  const emailjsReady = useRef(false);
   const saveTimer = useRef(null);
+  const closeModal = useCallback(() => setModalOpen(false), []);
+  useDialog(modalOpen, closeModal, '.guide-modal-overlay');
 
   // ── Persist to localStorage with debounce + timestamp ───────────────────
   useEffect(() => {
     clearTimeout(saveTimer.current);
-    saveTimer.current = setTimeout(() => {
+    const persist = () => {
       try {
         const s = {};
         Object.assign(s, answers);
         Object.keys(checked).forEach(id => { if (checked[id]) s[id] = true; });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
         localStorage.setItem(STORAGE_KEY + '_meta', JSON.stringify({ savedAt: new Date().toISOString() }));
-      } catch { /* quota */ }
-    }, 400);
+      } catch { setSubmitStatus('Browser storage unavailable. Download a summary before leaving.'); }
+    };
+    persist();
   }, [answers, checked]);
 
   // ── Restore toast on mount ───────────────────────────────────────────────
@@ -467,29 +471,6 @@ export default function ClientGuide() {
       setTimeout(() => setToast(''), 4200);
     } catch { /* ok */ }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // ── Load EmailJS ─────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (typeof window.emailjs !== 'undefined') {
-      if (!emailjsReady.current) {
-        window.emailjs.init({ publicKey: GUIDE_CONFIG.emailjs_public_key });
-        emailjsReady.current = true;
-      }
-      return;
-    }
-    if (document.querySelector('script[data-guide-emailjs]')) return;
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-    s.async = true;
-    s.dataset.guideEmailjs = 'true';
-    s.onload = () => {
-      if (window.emailjs && !emailjsReady.current) {
-        window.emailjs.init({ publicKey: GUIDE_CONFIG.emailjs_public_key });
-        emailjsReady.current = true;
-      }
-    };
-    document.head.appendChild(s);
   }, []);
 
   // ── Scroll + active nav ──────────────────────────────────────────────────
@@ -525,10 +506,9 @@ export default function ClientGuide() {
 
   // ── Handlers ─────────────────────────────────────────────────────────────
   function handleAnswerChange(qId, value) {
+    setSubmitted(false);
     setAnswers(prev => ({ ...prev, ['answer_' + qId]: value }));
-    if (value.trim()) {
-      setChecked(prev => ({ ...prev, [qId]: true }));
-    }
+    setChecked(prev => ({ ...prev, [qId]: !!value.trim() }));
   }
 
   function handleCheckedChange(qId, val) {
@@ -552,9 +532,12 @@ export default function ClientGuide() {
   }
 
   function resetProgress() {
+    if (!window.confirm('Clear all answers in this guide?')) return;
+    clearTimeout(saveTimer.current);
     setAnswers({});
     setChecked({});
-    try { localStorage.removeItem(STORAGE_KEY); } catch { /* ok */ }
+    setSubmitted(false);
+    try { localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(STORAGE_KEY + '_meta'); } catch { /* ok */ }
     showToast('Progress reset.');
   }
 
@@ -567,74 +550,30 @@ export default function ClientGuide() {
   }
 
   async function handleSubmit() {
+    if (submitting || !document.getElementById('guideSubmitterEmail').reportValidity()) return;
+    const questions = SECTIONS.flatMap(section => section.questions.map(q => ({
+      id: q.id, section: section.heading, question: q.heading, answer: answers['answer_' + q.id]?.trim() || '',
+    })));
+    if (!questions.some(q => q.answer)) { showToast('Write at least one answer before submitting.'); return; }
     const textSummary = buildTextSummary(answers, checked);
     const htmlContent = buildHtmlSummary(answers, checked, textSummary);
-
-    // Open summary window synchronously (before async)
-    const summaryWin = window.open('', '_blank', 'width=900,height=700,scrollbars=yes');
-    if (summaryWin) {
-      summaryWin.document.write(`<!doctype html><html><head><meta charset="UTF-8"><title>Preparing summary</title></head><body style="font-family:sans-serif;padding:40px;color:#555">Preparing your detailed summary…</body></html>`);
-    }
-
+    const backup = openSummary(htmlContent, textSummary);
+    setSubmitted(false);
+    setSubmitting(true);
     setModalOpen(false);
-    setSubmitStatus('Sending answers…');
-
-    const formData = new FormData();
-    formData.append('_subject', 'Website Planning Guide — submitted answers');
-    if (submitterEmail) formData.append('_replyto', submitterEmail);
-    formData.append('guide_title', 'General Client Question Guide');
-    formData.append('submitted_by', submitterEmail || '(not provided)');
-    formData.append('summary', textSummary);
-    SECTIONS.forEach(section => {
-      section.questions.forEach((q, i) => {
-        formData.append('Question_' + (i + 1), q.heading);
-        formData.append('Answer_' + (i + 1), answers['answer_' + q.id]?.trim() || '[Not answered]');
-      });
-    });
-
+    setSubmitStatus('Saving answers…');
     try {
-      const res = await fetch(GUIDE_CONFIG.formspreeEndpoint, {
-        method: 'POST',
-        body: formData,
-        headers: { Accept: 'application/json' },
+      await saveSubmission({
+        guideId: 'general', title: 'General Client Question Guide', senderEmail: submitterEmail.trim(),
+        date: new Date().toLocaleDateString('en-AU'), questions, summary: textSummary,
       });
-      if (!res.ok) throw new Error('Form submission failed');
-
-      // Write final content to summary window
-      if (summaryWin) {
-        summaryWin.document.open();
-        summaryWin.document.write(htmlContent);
-        summaryWin.document.close();
-      }
-
-      // EmailJS copy
-      if (submitterEmail && emailjsReady.current && window.emailjs) {
-        window.emailjs.send(
-          GUIDE_CONFIG.emailjs_service_id,
-          GUIDE_CONFIG.emailjs_template_id,
-          {
-            to_email: submitterEmail,
-            to_name: 'there',
-            developer_name: GUIDE_CONFIG.developerName,
-            brief_text: textSummary,
-            subject: 'Website Planning Guide — submitted answers',
-          }
-        ).then(() => showToast('A copy has been sent to ' + submitterEmail))
-          .catch(err => console.warn('EmailJS send failed:', err));
-      }
-
       setSubmitted(true);
-      setSubmitStatus('Submitted. A printable summary has opened.');
+      setSubmitStatus(`Answers saved. ${backup}`);
       showToast('Answers submitted successfully.');
-    } catch {
-      if (summaryWin) {
-        summaryWin.document.open();
-        summaryWin.document.write(htmlContent);
-        summaryWin.document.close();
-      }
-      setSubmitStatus('Submission failed. Your printable summary is open so you can copy or save it.');
-      showToast('Could not submit. Use the summary window as a backup.');
-    }
+    } catch (error) {
+      setSubmitStatus(`Submission not confirmed. ${error.message} ${backup} Keep your backup and retry.`);
+      showToast('Submission failed. Your answers remain here.');
+    } finally { setSubmitting(false); }
   }
 
   // ── Nav links ─────────────────────────────────────────────────────────────
@@ -707,7 +646,7 @@ export default function ClientGuide() {
           {submitted && (
             <div className="guide-success" style={{ display: 'block' }}>
               <h2>Answers submitted successfully</h2>
-              <p>Your completed guide has been sent. A printable summary has opened in a new window.</p>
+              <p>Your completed guide is saved for authorised review. Keep the printable or downloaded summary. No email is sent automatically.</p>
             </div>
           )}
 
@@ -822,7 +761,7 @@ export default function ClientGuide() {
       </main>
 
       {/* Sticky action bar */}
-      <div style={{
+      <div className="guide-action-bar" style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
         display: 'flex', alignItems: 'center', gap: '10px',
         padding: '12px 24px',
@@ -831,19 +770,19 @@ export default function ClientGuide() {
         backdropFilter: 'blur(14px)',
         boxShadow: '0 -6px 28px rgba(24,32,43,0.14)',
       }}>
-        <div style={{ marginRight: 'auto', color: '#5f6570', fontSize: '13px' }}>{submitStatus}</div>
+        <div className="guide-action-status" role="status" style={{ marginRight: 'auto', color: '#5f6570', fontSize: '13px' }}>{submitStatus}</div>
         <button type="button" onClick={resetProgress} style={BTN}>Clear answers</button>
-        <button type="button" onClick={() => window.print()} style={BTN}>Print / Save PDF</button>
-        <button type="button" onClick={openSubmitModal} style={BTN_PRIMARY}>Submit answers</button>
+        <button type="button" onClick={() => openSummary(buildHtmlSummary(answers, checked, buildTextSummary(answers, checked)), buildTextSummary(answers, checked))} style={BTN}>Print / Save PDF</button>
+        <button type="button" disabled={submitting} onClick={openSubmitModal} style={BTN_PRIMARY}>Submit answers</button>
       </div>
 
       {/* Submit modal */}
       {modalOpen && (
-        <div className="guide-modal-overlay open" role="dialog" aria-modal="true" onClick={e => { if (e.target === e.currentTarget) closeSubmitModal(); }}>
+        <div className="guide-modal-overlay open" role="dialog" aria-modal="true" aria-labelledby="guide-submit-heading" onClick={e => { if (e.target === e.currentTarget) closeSubmitModal(); }}>
           <div className="guide-modal">
-            <h2>Ready to submit?</h2>
+            <h2 id="guide-submit-heading">Ready to submit?</h2>
             <p>Your answers will be compiled into a detailed website planning summary with recommendations, tables, and reference links.</p>
-            <p>The summary will be sent to the website team and opened in a printable window for your own records.</p>
+            <p>The summary will be saved for authorised review. A printable or downloaded copy is available for your records.</p>
             <label htmlFor="guideSubmitterEmail">
               Your email address{' '}
               <span style={{ fontWeight: 400, color: '#5f6570' }}>(optional)</span>
@@ -854,13 +793,12 @@ export default function ClientGuide() {
               placeholder="yourname@email.com"
               value={submitterEmail}
               onChange={e => setSubmitterEmail(e.target.value)}
-              autoFocus
             />
             <div className="guide-modal-actions">
               <button type="button" className="submit-action" onClick={handleSubmit}>Send my answers</button>
               <button type="button" onClick={closeSubmitModal}>Go back and check</button>
             </div>
-            <p className="privacy-note">Only submit information you are comfortable sharing with the website team.</p>
+            <p className="privacy-note">Drafts stay in this browser; submitted answers are stored in the project database. No email is sent automatically.</p>
           </div>
         </div>
       )}

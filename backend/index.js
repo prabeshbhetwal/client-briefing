@@ -1,43 +1,27 @@
-import express from 'express';
 import mongoose from 'mongoose';
-import cors from 'cors';
 import dotenv from 'dotenv';
 
-dotenv.config();
+dotenv.config({ path: new URL('./.env', import.meta.url) });
+const { app } = await import('./app.js');
+const port = Number(process.env.PORT || 5001);
+if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('PORT must be 1–65535.');
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// MongoDB connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/vincomm')
-.then(() => console.log('MongoDB connected'))
-.catch((err) => console.log('MongoDB connection error:', err));
-
-// Define Schema & Model for Submissions
-const submissionSchema = new mongoose.Schema({
-  guideId: String,
-  title: String,
-  senderEmail: String,
-  date: String,
-  questions: Array,
-  createdAt: { type: Date, default: Date.now }
-});
-
-const Submission = mongoose.model('Submission', submissionSchema);
-
-// API Routes
-app.post('/api/submissions', async (req, res) => {
-  try {
-    const newSubmission = new Submission(req.body);
-    await newSubmission.save();
-    res.status(201).json({ message: 'Submission saved successfully', submission: newSubmission });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to save submission' });
+try {
+  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/pb_client_briefing', {
+    serverSelectionTimeoutMS: 5000,
+  });
+  const server = app.listen(port, process.env.HOST || '127.0.0.1', () => {
+    console.log(`Client Briefing API ready on port ${port}`);
+  });
+  server.on('error', async () => {
+    console.error('API could not listen. Check the host and port.');
+    await mongoose.disconnect();
+    process.exitCode = 1;
+  });
+  for (const signal of ['SIGINT', 'SIGTERM']) {
+    process.once(signal, () => server.close(async () => { await mongoose.disconnect(); process.exit(0); }));
   }
-});
-
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+} catch {
+  console.error('MongoDB unavailable. Check backend/.env and start MongoDB. No submissions accepted.');
+  process.exitCode = 1;
+}
