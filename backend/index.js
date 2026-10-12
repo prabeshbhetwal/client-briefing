@@ -7,7 +7,7 @@ const port = Number(process.env.PORT || 5001);
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('PORT must be 1–65535.');
 
 try {
-  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/pb_client_briefing', {
+  await mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/vincomm', {
     serverSelectionTimeoutMS: 5000,
   });
   const server = app.listen(port, process.env.HOST || '127.0.0.1', () => {

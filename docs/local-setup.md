@@ -11,6 +11,8 @@ cp -n backend/.env.example backend/.env
 
 Preserve an existing `.env`. Generate a random token using `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`, paste it into `ADMIN_TOKEN`. A missing token or fewer than 32 characters disables admin access. Tokens must remain server-side, never in `VITE_` variables, source or Git. Atlas is optional only when its account and costs are already approved.
 
+With `MONGODB_URI` unset, the server preserves its legacy `mongodb://127.0.0.1:27017/vincomm` default. Preserve an existing explicit URI and its database selection. No existing database is renamed or migrated.
+
 ## Run and stop
 
 Check port ownership before starting. Use your configured MongoDB, or start a new dedicated local instance in a separate terminal:

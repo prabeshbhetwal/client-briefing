@@ -188,6 +188,40 @@ test('documented development manager starts both servers and stops its children'
   for (const port of ports) await assert.rejects(fetch(`http://127.0.0.1:${port}/`, { signal: AbortSignal.timeout(1000) }));
 });
 
+test('actual startup with MONGODB_URI unset preserves the legacy default on an isolated fixture', async () => {
+  const socket = net.createServer();
+  socket.listen(0, '127.0.0.1');
+  await once(socket, 'listening');
+  const port = socket.address().port;
+  await new Promise(resolve => socket.close(resolve));
+  // Select the real default, then redirect the connection; never read user .env or connect to port 27017.
+  const preload = `
+    import assert from 'node:assert/strict';
+    import mongoose from ${JSON.stringify(new URL('../backend/node_modules/mongoose/index.js', import.meta.url).href)};
+    import dotenv from ${JSON.stringify(new URL('../backend/node_modules/dotenv/lib/main.js', import.meta.url).href)};
+    dotenv.config = () => ({ parsed: {} });
+    const connect = mongoose.connect.bind(mongoose);
+    mongoose.connect = (uri, options) => {
+      assert.equal(uri, 'mongodb://127.0.0.1:27017/vincomm');
+      return connect(${JSON.stringify(mongoUri)}, options);
+    };
+  `;
+  const env = { ...process.env, PORT: String(port), HOST: '127.0.0.1', ADMIN_TOKEN: token };
+  delete env.MONGODB_URI;
+  const child = spawn(process.execPath, ['--import', `data:text/javascript,${encodeURIComponent(preload)}`, 'backend/index.js'], { env, stdio: 'ignore' });
+  try {
+    let ready = false;
+    for (let attempt = 0; attempt < 40 && child.exitCode === null; attempt++) {
+      try { ready = (await fetch(`http://127.0.0.1:${port}/api/health`, { signal: AbortSignal.timeout(500) })).ok; } catch { /* starting */ }
+      if (ready) break;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    assert.ok(ready, 'Actual startup must select vincomm before connecting to the owned fixture');
+  } finally {
+    if (child.exitCode === null) { const exited = once(child, 'exit'); child.kill('SIGTERM'); await exited; }
+  }
+});
+
 test('database disconnect returns immediate 503 without accepting a write', async () => {
   await mongoose.disconnect();
   assert.equal((await fetch(`${base}/api/health`)).status, 503);

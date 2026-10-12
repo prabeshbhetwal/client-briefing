@@ -40,7 +40,7 @@ Copy `backend/.env.example` to `backend/.env` without replacing an existing file
 ```env
 PORT=5001
 HOST=127.0.0.1
-MONGODB_URI=mongodb://127.0.0.1:27017/pb_client_briefing
+MONGODB_URI=mongodb://127.0.0.1:27017/vincomm
 ADMIN_TOKEN=
 ```
 
